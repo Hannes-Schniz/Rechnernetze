@@ -1,3 +1,5 @@
+package src.address;
+
 public class IP implements Comparable<IP> {
 
     public IP(final String pointNotation) throws ParseException {
