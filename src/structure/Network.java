@@ -1,5 +1,6 @@
-package src;
-import src.address.*;
+package src.structure;
+import src.parser.ParseException;
+
 import java.util.List;
 
 public class Network {

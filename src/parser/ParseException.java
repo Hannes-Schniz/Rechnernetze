@@ -1,4 +1,4 @@
-package src.address;
+package src.parser;
 
 public class ParseException extends Exception {
     public ParseException(String message) {

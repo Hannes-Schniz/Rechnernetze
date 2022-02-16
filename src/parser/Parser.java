@@ -1,4 +1,4 @@
-package src.address;
+package src.parser;
 
 public class Parser {
     public static String parseToString(int[] input) {

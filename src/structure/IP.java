@@ -1,4 +1,7 @@
-package src.address;
+package src.structure;
+
+import src.parser.ParseException;
+import src.parser.Parser;
 
 public class IP implements Comparable<IP> {
 
