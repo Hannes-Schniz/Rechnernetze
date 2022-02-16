@@ -10,6 +10,7 @@ public class Node {
     private boolean isRoot;
     private List<Node> connections;
     private Node upperNode;
+    private int layer;
 
     public Node(IP tag, int gradiant, boolean isRoot, List<Node> connections, Node upperNode) {
         this.tag = tag;
@@ -17,6 +18,12 @@ public class Node {
         this.isRoot = isRoot;
         this.connections = connections;
         this.upperNode = upperNode;
+        if (isRoot) {
+            this.layer = 0;
+        }
+        else {
+            this.layer = upperNode.getLayer() + 1;
+        }
     }
 
     public Node(IP tag) {
@@ -25,6 +32,7 @@ public class Node {
         this.isRoot = false;
         this.connections = new ArrayList<>();
         this.upperNode = null;
+        this.layer = 0;
     }
 
     public IP getTag() {
@@ -73,5 +81,13 @@ public class Node {
         for (Node connection: connections) {
             connection.setUpperNode(upperNode);
         }
+    }
+
+    public int getLayer() {
+        return layer;
+    }
+
+    public void setLayer(int layer) {
+        this.layer = layer;
     }
 }

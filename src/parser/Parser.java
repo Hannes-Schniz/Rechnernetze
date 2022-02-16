@@ -23,4 +23,9 @@ public class Parser {
         }
         return returnValue;
     }
+
+   // public static String[] parseToPoint(String input) {
+   //     String working = input.substring(1, input.length() - 2);
+   //     String[] returnValue = working.split()
+   // }
 }

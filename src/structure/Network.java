@@ -6,11 +6,12 @@ import java.util.List;
 
 public class Network {
 
-    private Node tree;
+    private List<Node> trees;
     public Network(final IP root, final List<IP> children) {
-        this.tree = new Node(root, children.size(), true,new ArrayList<>(),null);
-        this.tree.initNewConnections(children);
-        this.tree.setAllUpperNodes(this.tree);
+        this.trees = new ArrayList<>();
+        this.trees.add(new Node(root, children.size(), true,new ArrayList<>(),null));
+        this.trees.get(0).initNewConnections(children);
+        this.trees.get(0).setAllUpperNodes(this.trees.get(0));
     }
 
     public Network(final String bracketNotation) throws ParseException {
@@ -21,21 +22,15 @@ public class Network {
     }
 
     public List<IP> list() {
-        Node pointer = this.tree;
         List<Node> foundList = new ArrayList<>();
-        foundList.add(tree);
-        while (!pointer.isRoot() && !foundList.containsAll(pointer.getConnections())) {
-            if (firstNode(pointer.getConnections(), foundList) == 0) {
-                pointer = pointer.getUpperNode();
-            }
-            pointer = pointer.getConnections().get(firstNode(pointer.getConnections(), foundList));
-            foundList.add(pointer);
+        for (int i = 0; i < trees.size(); i++) {
+            foundList.addAll(dfs(this.trees.get(i)));
         }
         List<IP> returnValues = new ArrayList<>();
         for (Node found: foundList) {
             returnValues.add(found.getTag());
         }
-        return returnValues;
+        return returnValues; //still needs to be sorted
     }
 
     public boolean connect(final IP ip1, final IP ip2) {
@@ -47,11 +42,21 @@ public class Network {
     }
 
     public boolean contains(final IP ip) {
-        return false;
+        return this.list().contains(ip);
     }
 
     public int getHeight(final IP root) {
-        return 0;
+        int currMaxHeight = 0;
+        if (contains(root)) {
+            List<Node> foundTree = getTree(root);
+            assert foundTree != null;
+            for (Node node: foundTree) {
+                if (currMaxHeight < node.getLayer()) {
+                    currMaxHeight = node.getLayer();
+                }
+            }
+        }
+        return currMaxHeight;
     }
 
     public List<List<IP>> getLevels(final IP root) {
@@ -67,15 +72,41 @@ public class Network {
     }
 
     private int firstNode(List<Node> pointer, List<Node> found) {
-        if (found.containsAll(pointer)) {
-            return 0;
-        }
-        int retunValue = 0;
-        for (Node node:pointer) {
-            if (found.contains(pointer)) {
-                retunValue++;
+        int returnValue = 0;
+        if (!found.containsAll(pointer)) {
+            for (Node node:pointer) {
+                if (found.contains(node)) {
+                    returnValue++;
+                }
             }
         }
-        return retunValue;
+        return returnValue;
     }
+
+    private List<Node> dfs(Node tree) {
+        List<Node> foundList = new ArrayList<>();
+        Node pointer = tree;
+        foundList.add(tree);
+        while (!pointer.isRoot() && !foundList.containsAll(pointer.getConnections())) {
+            if (firstNode(pointer.getConnections(), foundList) == 0) {
+                pointer = pointer.getUpperNode();
+            }
+            pointer = pointer.getConnections().get(firstNode(pointer.getConnections(), foundList));
+            foundList.add(pointer);
+        }
+        return foundList;
+    }
+
+    private List<Node> getTree(IP tag) {
+        for (Node tree : trees) {
+            List<Node> curr = dfs(tree);
+            for (Node node : curr) {
+                if (node.getTag().equals(tag)) {
+                    return curr;
+                }
+            }
+        }
+        return null;
+    }
+
 }
