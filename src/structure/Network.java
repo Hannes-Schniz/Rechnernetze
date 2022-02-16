@@ -23,8 +23,8 @@ public class Network {
 
     public List<IP> list() {
         List<Node> foundList = new ArrayList<>();
-        for (int i = 0; i < trees.size(); i++) {
-            foundList.addAll(dfs(this.trees.get(i)));
+        for (Node tree : trees) {
+            foundList.addAll(dfs(tree));
         }
         List<IP> returnValues = new ArrayList<>();
         for (Node found: foundList) {
