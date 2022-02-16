@@ -18,6 +18,14 @@ public class Knot {
         this.upperKnot = upperKnot;
     }
 
+    public Knot(IP tag) {
+        this.tag = tag;
+        this.gradiant = 0;
+        this.isRoot = false;
+        this.connections = null;
+        this.upperKnot = null;
+    }
+
     public IP getTag() {
         return tag;
     }
@@ -46,11 +54,23 @@ public class Knot {
         this.connections = connections;
     }
 
+    public void initNewConnections(List<IP> connections) {
+        for (IP connection : connections) {
+            this.connections.add(new Knot(connection));
+        }
+    }
+
     public Knot getUpperKnot() {
         return upperKnot;
     }
 
     public void setUpperKnot(Knot upperKnot) {
         this.upperKnot = upperKnot;
+    }
+
+    public void setAllUpperKnots(Knot upperKnot) {
+        for (Knot connection: connections) {
+            connection.setUpperKnot(upperKnot);
+        }
     }
 }

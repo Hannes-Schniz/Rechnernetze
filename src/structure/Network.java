@@ -1,10 +1,15 @@
 package src.structure;
-import src.parser.ParseException;
+import src.parser.*;
 
 import java.util.List;
 
 public class Network {
+
+    private Knot tree;
     public Network(final IP root, final List<IP> children) {
+        this.tree = new Knot(root, children.size(), true,null,null);
+        this.tree.initNewConnections(children);
+        this.tree.setAllUpperKnots(this.tree);
     }
 
     public Network(final String bracketNotation) throws ParseException {
