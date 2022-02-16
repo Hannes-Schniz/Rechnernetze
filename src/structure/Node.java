@@ -1,29 +1,30 @@
 package src.structure;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Knot {
+public class Node {
 
     private final IP tag;
     private int gradiant;
     private boolean isRoot;
-    private List<Knot> connections;
-    private Knot upperKnot;
+    private List<Node> connections;
+    private Node upperNode;
 
-    public Knot(IP tag, int gradiant, boolean isRoot, List<Knot> connections, Knot upperKnot) {
+    public Node(IP tag, int gradiant, boolean isRoot, List<Node> connections, Node upperNode) {
         this.tag = tag;
         this.gradiant = gradiant;
         this.isRoot = isRoot;
         this.connections = connections;
-        this.upperKnot = upperKnot;
+        this.upperNode = upperNode;
     }
 
-    public Knot(IP tag) {
+    public Node(IP tag) {
         this.tag = tag;
         this.gradiant = 0;
         this.isRoot = false;
-        this.connections = null;
-        this.upperKnot = null;
+        this.connections = new ArrayList<>();
+        this.upperNode = null;
     }
 
     public IP getTag() {
@@ -46,31 +47,31 @@ public class Knot {
         isRoot = root;
     }
 
-    public List<Knot> getConnections() {
+    public List<Node> getConnections() {
         return connections;
     }
 
-    public void setConnections(List<Knot> connections) {
+    public void setConnections(List<Node> connections) {
         this.connections = connections;
     }
 
     public void initNewConnections(List<IP> connections) {
         for (IP connection : connections) {
-            this.connections.add(new Knot(connection));
+            this.connections.add(new Node(connection));
         }
     }
 
-    public Knot getUpperKnot() {
-        return upperKnot;
+    public Node getUpperNode() {
+        return upperNode;
     }
 
-    public void setUpperKnot(Knot upperKnot) {
-        this.upperKnot = upperKnot;
+    public void setUpperNode(Node upperNode) {
+        this.upperNode = upperNode;
     }
 
-    public void setAllUpperKnots(Knot upperKnot) {
-        for (Knot connection: connections) {
-            connection.setUpperKnot(upperKnot);
+    public void setAllUpperNodes(Node upperNode) {
+        for (Node connection: connections) {
+            connection.setUpperNode(upperNode);
         }
     }
 }

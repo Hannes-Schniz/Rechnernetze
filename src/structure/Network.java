@@ -1,15 +1,16 @@
 package src.structure;
 import src.parser.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Network {
 
-    private Knot tree;
+    private Node tree;
     public Network(final IP root, final List<IP> children) {
-        this.tree = new Knot(root, children.size(), true,null,null);
+        this.tree = new Node(root, children.size(), true,new ArrayList<>(),null);
         this.tree.initNewConnections(children);
-        this.tree.setAllUpperKnots(this.tree);
+        this.tree.setAllUpperNodes(this.tree);
     }
 
     public Network(final String bracketNotation) throws ParseException {
@@ -20,7 +21,21 @@ public class Network {
     }
 
     public List<IP> list() {
-        return null;
+        Node pointer = this.tree;
+        List<Node> foundList = new ArrayList<>();
+        foundList.add(tree);
+        while (!pointer.isRoot() && !foundList.containsAll(pointer.getConnections())) {
+            if (firstNode(pointer.getConnections(), foundList) == 0) {
+                pointer = pointer.getUpperNode();
+            }
+            pointer = pointer.getConnections().get(firstNode(pointer.getConnections(), foundList));
+            foundList.add(pointer);
+        }
+        List<IP> returnValues = new ArrayList<>();
+        for (Node found: foundList) {
+            returnValues.add(found.getTag());
+        }
+        return returnValues;
     }
 
     public boolean connect(final IP ip1, final IP ip2) {
@@ -49,5 +64,18 @@ public class Network {
 
     public String toString(IP root) {
         return null;
+    }
+
+    private int firstNode(List<Node> pointer, List<Node> found) {
+        if (found.containsAll(pointer)) {
+            return 0;
+        }
+        int retunValue = 0;
+        for (Node node:pointer) {
+            if (found.contains(pointer)) {
+                retunValue++;
+            }
+        }
+        return retunValue;
     }
 }
