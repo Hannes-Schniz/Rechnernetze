@@ -36,36 +36,35 @@ public class Network {
      * @throws ParseException the parse exception
      */
     public Network(final String bracketNotation) throws ParseException {
-        this.dfsTree = new ArrayList<>();
-        String[] layers = Parser.parseToTree(bracketNotation);
         this.trees = new ArrayList<>();
-        String[] root = Parser.pointNotation(layers[0]);
-        Node prevNode = new Node(new IP(root[0]), root.length - 1, true, new ArrayList<>(), null);
-        for (int i = 1; i < root.length; i++) {
-            prevNode.addConnection(new Node(new IP(root[i]), 1, false, new ArrayList<>(), prevNode));
+        String[] layers = Parser.parseToTree(bracketNotation);
+        String[] currLayer = Parser.pointNotation(layers[0]);
+        Node pointer = new Node(new IP(currLayer[0]), currLayer.length - 1, true, new ArrayList<>(), null);
+        for (int i = 1; i < currLayer.length; i++) {
+            pointer.addConnection(new Node(new IP(currLayer[i]), 1, false, new ArrayList<>(), pointer));
         }
         for (int i = 1; i < layers.length; i++) {
-            String[] currLayer = Parser.pointNotation(layers[i]);
-            IP currTag = new IP(currLayer[0]);
-            int pos = prevNode.hasConnection(currTag);
+            currLayer = Parser.pointNotation(layers[i]);
+            int pos = pointer.hasConnection(new IP(currLayer[0]));
             while (pos < 0) {
-                prevNode = prevNode.getUpperNode();
-                pos = prevNode.hasConnection(currTag);
+                pointer = pointer.getUpperNode();
+                pos = pointer.hasConnection(new IP(currLayer[0]));
             }
-            List<Node> prevConnections = prevNode.getConnections();
-            List<Node> toChangeList = prevConnections.get(i).getConnections();
-            if (toChangeList == null) {
-                toChangeList = new ArrayList<>();
-            }
+            List<Node> toChangeList = pointer.getConnections().get(i).getConnections();
             for (int j = 1; j < currLayer.length; j++) {
                 toChangeList.add(new Node(new IP(currLayer[j]), 1,  false, new ArrayList<>(), null));
             }
-            prevNode = prevConnections.get(pos);
+            pointer = pointer.getConnections().get(pos);
         }
-        while (!prevNode.isRoot()) {
-            prevNode = prevNode.getUpperNode();
+        this.trees.add(shiftTop(pointer));
+    }
+
+    private Node shiftTop(Node input) {
+        Node root = input;
+        while (!root.isRoot()) {
+            root = root.getUpperNode();
         }
-        this.trees.add(prevNode);
+        return root;
     }
 
     /**
