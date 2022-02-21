@@ -24,7 +24,7 @@ public class IP implements Comparable<IP> {
 
     @Override
     public String toString() {
-        return Parser.parseToString(address);
+        return Parser.parseToString(address).substring(0, Parser.parseToString(address).length() - 1);
     }
 
     @Override

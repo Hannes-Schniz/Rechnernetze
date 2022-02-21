@@ -13,6 +13,7 @@ public class Network {
 
     private final int first = 0;
     private List<Node> trees;
+    private List<Node> dfsTree;
 
     /**
      * Instantiates a new Network.
@@ -25,6 +26,7 @@ public class Network {
         this.trees.add(new Node(root, children.size(), true, new ArrayList<>(), null));
         this.trees.get(first).initNewConnections(children);
         this.trees.get(first).setAllUpperNodes(this.trees.get(first));
+        this.dfsTree = new ArrayList<>();
     }
 
     /**
@@ -34,6 +36,7 @@ public class Network {
      * @throws ParseException the parse exception
      */
     public Network(final String bracketNotation) throws ParseException {
+        this.dfsTree = new ArrayList<>();
         String[] layers = Parser.parseToTree(bracketNotation);
         this.trees = new ArrayList<>();
         String[] root = Parser.pointNotation(layers[0]);
@@ -83,7 +86,8 @@ public class Network {
     public List<IP> list() {
         List<Node> foundList = new ArrayList<>();
         for (Node tree : trees) {
-            foundList.addAll(dfs(tree));
+            doDFS(tree);
+            foundList.addAll(dfsTree);
         }
         List<IP> returnValues = new ArrayList<>();
         for (Node found: foundList) {
@@ -145,8 +149,8 @@ public class Network {
     public int getHeight(final IP root) {
         int currMaxHeight = first;
         if (contains(root)) {
-            List<Node> foundTree = dfs(this.trees.get(getTree(root)));
-            for (Node node: foundTree) {
+            doDFS(this.trees.get(getTree(root)));
+            for (Node node: dfsTree) {
                 if (currMaxHeight < node.getLayer()) {
                     currMaxHeight = node.getLayer();
                 }
@@ -186,35 +190,22 @@ public class Network {
         return null;
     }
 
-    private int firstNode(List<Node> pointer, List<Node> found) {
-        int returnValue = first;
-        if (!found.containsAll(pointer)) {
-            for (Node node:pointer) {
-                if (found.contains(node)) {
-                    returnValue++;
-                }
-            }
-        }
-        return returnValue;
+    private void doDFS(Node tree) {
+        this.dfsTree = new ArrayList<>();
+        dfs(tree);
     }
 
-    private List<Node> dfs(Node tree) {
-        List<Node> foundList = new ArrayList<>();
-        Node pointer = tree;
-        foundList.add(tree);
-        while (!pointer.isRoot() && !foundList.containsAll(pointer.getConnections())) {
-            if (firstNode(pointer.getConnections(), foundList) == first) {
-                pointer = pointer.getUpperNode();
-            }
-            pointer = pointer.getConnections().get(firstNode(pointer.getConnections(), foundList));
-            foundList.add(pointer);
+    private void dfs(Node tree) {
+        dfsTree.add(tree);
+        for (Node node: tree.getConnections()) {
+            dfs(node);
         }
-        return foundList;
     }
 
     private int getTree(IP tag) {
         for (int i = 0; i < trees.size(); i++) {
-            List<Node> curr = dfs(trees.get(i));
+            dfs(trees.get(i));
+            List<Node> curr = dfsTree;
             for (Node node : curr) {
                 if (node.getTag().compareTo(tag) == 0) {
                     return i;
