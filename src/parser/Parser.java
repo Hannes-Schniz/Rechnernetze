@@ -42,25 +42,30 @@ public class Parser {
         return returnValue;
     }
 
-    public static String[] parseToTree(String input) {
-        String[] working = input.split("\s");
-        String[] returnString = new String[1];
+    public static String[] parseToTree(String bracketNotation) {
+        String[] working = bracketNotation.split("\s");
+        String[] parsedInput = new String[1];
         for (int i = 0; i < working.length; i++) {
             int pos = 0;
             if (distance(working[i]) == 1) {
                 int match = findMatching(working, i);
-                if (i > 0 ) {
-                    returnString = extend(returnString);
+                if (i > 0) {
+                    parsedInput = extend(parsedInput);
                 }
-                returnString[returnString.length - 1] = crop(working[i]);
+                parsedInput[parsedInput.length - 1] = crop(working[i]);
                 for (int j = i + 1; j < match + 1; j++) {
                     if (pos == 0) {
-                        returnString[returnString.length - 1] += " " + crop(working[j]);
+                        parsedInput[parsedInput.length - 1] += " " + crop(working[j]);
                     }
                     pos += distance(working[j]);
                 }
             }
         }
+        return parsedInput;
+    }
+
+    public static String[] pointNotation(String bracketIPs) throws ParseException {
+        String[] returnString = bracketIPs.split("\s");
         return returnString;
     }
 

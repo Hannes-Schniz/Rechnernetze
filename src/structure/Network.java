@@ -34,6 +34,35 @@ public class Network {
      * @throws ParseException the parse exception
      */
     public Network(final String bracketNotation) throws ParseException {
+        String[] layers = Parser.parseToTree(bracketNotation);
+        this.trees = new ArrayList<>();
+        String[] root = Parser.pointNotation(layers[0]);
+        Node prevNode = new Node(new IP(root[0]), root.length - 1, true, new ArrayList<>(), null);
+        for (int i = 1; i < root.length; i++) {
+            prevNode.addConnection(new Node(new IP(root[i]), 1, false, new ArrayList<>(), prevNode));
+        }
+        for (int i = 1; i < layers.length; i++) {
+            String[] currLayer = Parser.pointNotation(layers[i]);
+            IP currTag = new IP(currLayer[0]);
+            int pos = prevNode.hasConnection(currTag);
+            while (pos < 0) {
+                prevNode = prevNode.getUpperNode();
+                pos = prevNode.hasConnection(currTag);
+            }
+            List<Node> prevConnections = prevNode.getConnections();
+            List<Node> toChangeList = prevConnections.get(i).getConnections();
+            if (toChangeList == null) {
+                toChangeList = new ArrayList<>();
+            }
+            for (int j = 1; j < currLayer.length; j++) {
+                toChangeList.add(new Node(new IP(currLayer[j]), 1,  false, new ArrayList<>(), null));
+            }
+            prevNode = prevConnections.get(pos);
+        }
+        while (!prevNode.isRoot()) {
+            prevNode = prevNode.getUpperNode();
+        }
+        this.trees.add(prevNode);
     }
 
     /**
@@ -60,7 +89,7 @@ public class Network {
         for (Node found: foundList) {
             returnValues.add(found.getTag());
         }
-        return returnValues; //still needs to be sorted
+        return sortList(returnValues);
     }
 
     /**
@@ -71,6 +100,18 @@ public class Network {
      * @return the boolean
      */
     public boolean connect(final IP ip1, final IP ip2) {
+        Node treeOne = this.trees.get(getTree(ip1));
+        Node treeTwo = this.trees.get(getTree(ip2));
+        if (treeOne.isRoot()) {
+            treeOne.setAllUpperNodes(treeTwo);
+            treeTwo.addConnection(treeOne);
+            return true;
+        }
+        else if (treeTwo.isRoot()) {
+            treeTwo.setAllUpperNodes(treeOne);
+            treeOne.addConnection(treeTwo);
+            return true;
+        }
         return false;
     }
 
@@ -104,8 +145,7 @@ public class Network {
     public int getHeight(final IP root) {
         int currMaxHeight = first;
         if (contains(root)) {
-            List<Node> foundTree = getTree(root);
-            assert foundTree != null;
+            List<Node> foundTree = dfs(this.trees.get(getTree(root)));
             for (Node node: foundTree) {
                 if (currMaxHeight < node.getLayer()) {
                     currMaxHeight = node.getLayer();
@@ -172,29 +212,34 @@ public class Network {
         return foundList;
     }
 
-    private List<Node> getTree(IP tag) {
-        for (Node tree : trees) {
-            List<Node> curr = dfs(tree);
+    private int getTree(IP tag) {
+        for (int i = 0; i < trees.size(); i++) {
+            List<Node> curr = dfs(trees.get(i));
             for (Node node : curr) {
-                if (node.getTag().equals(tag)) {
-                    return curr;
+                if (node.getTag().compareTo(tag) == 0) {
+                    return i;
                 }
             }
         }
-        return null;
+        return -1;
     }
 
     private List<IP> sortList(List<IP> input) {
-        boolean didSwitch = false;
-        while (didSwitch) {
-            didSwitch = false;
-            for (int i = 1; i < input.size(); i++) {
+        int i = 1;
+        while (i < input.size()) {
+            if (i > 0) {
                 if (input.get(i).compareTo(input.get(i - 1)) < 0) {
                     IP curr = input.get(i);
                     input.set(i, input.get(i - 1));
                     input.set(i - 1, curr);
-                    didSwitch = true;
+                    i--;
                 }
+                else {
+                    i++;
+                }
+            }
+            else {
+                i++;
             }
         }
         return input;

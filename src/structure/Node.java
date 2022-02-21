@@ -32,7 +32,7 @@ public class Node {
         this.isRoot = isRoot;
         this.connections = connections;
         this.upperNode = upperNode;
-        if (isRoot) {
+        if (this.upperNode == null) {
             this.layer = 0;
         }
         else {
@@ -126,6 +126,15 @@ public class Node {
         for (IP connection : connections) {
             this.connections.add(new Node(connection));
         }
+        this.setGradiant(connections.size());
+    }
+
+    public void addConnection(Node connection) {
+        if (this.connections == null) {
+            this.connections = new ArrayList<>();
+        }
+        this.setGradiant(this.gradiant + 1);
+        this.connections.add(connection);
     }
 
     /**
@@ -143,7 +152,7 @@ public class Node {
      * @param upperNode the upper node
      */
     public void setUpperNode(Node upperNode) {
-        this.upperNode = upperNode;
+        this.upperNode = upperNode; //need to check if there was a upper node before for gradiant
     }
 
     /**
@@ -173,5 +182,14 @@ public class Node {
      */
     public void setLayer(int layer) {
         this.layer = layer;
+    }
+
+    public int hasConnection(IP tag) {
+        for (int i = 0; i < this.connections.size(); i++) {
+            if (this.connections.get(i).getTag().compareTo(tag) == 0) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
