@@ -14,23 +14,31 @@ class NetworkTest {
 
     private Network testNetwork;
 
+    private Network addNetwork;
+
     @BeforeEach
     void setUp() {
         try {
             testNetwork = new Network("(85.193.148.81"
                     + " (141.255.1.133 122.117.67.158 0.146.197.108) 34.49.145.239"
                     + " (231.189.0.127 77.135.84.171 39.20.222.120 252.29.23.0 116.132.83.77))");
+            addNetwork = new Network("(85.193.148.81 111.111.111.111)");
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
 
     @Test
-    void add() {
+    void list() {
+        List<IP> networkList = testNetwork.list();
+        for (IP ip: networkList) {
+            System.out.println(ip.toString());
+        }
     }
 
     @Test
-    void list() {
+    void add() {
+        testNetwork.add(addNetwork);
         List<IP> networkList = testNetwork.list();
         for (IP ip: networkList) {
             System.out.println(ip.toString());

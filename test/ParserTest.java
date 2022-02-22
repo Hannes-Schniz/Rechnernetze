@@ -1,6 +1,5 @@
 package test;
 
-import org.junit.Assert;
 import src.parser.Parser;
 
 import static org.junit.jupiter.api.Assertions.*;

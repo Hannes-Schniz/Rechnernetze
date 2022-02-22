@@ -74,7 +74,38 @@ public class Network {
      * @return the boolean
      */
     public boolean add(final Network subnet) {
-        return false;
+        boolean returnBool = false;
+        for (Node inputTree: subnet.getTrees()) {
+            doDFS(inputTree);
+            List<Node> inputDFSTree = this.dfsTree;
+            for (Node node: inputDFSTree) {
+                int pos = getTree(node.getTag());
+                if (pos >= 0) {
+                    Node treeNode = findNode(trees.get(pos), node.getTag());
+                    treeNode.addAllConnections(node.getConnections());
+                    treeNode = shiftTop(treeNode);
+                    trees.set(pos, treeNode);
+                    returnBool = true;
+                    break;
+                }
+            }
+        }
+        return returnBool;
+    }
+
+    private Node findNode(Node tree, IP tag) {
+        Node returnNode = null;
+        if (tree.getTag().compareTo(tag) == 0) {
+            return tree;
+        }
+        for (Node node: tree.getConnections()) {
+            returnNode = findNode(node, tag);
+        }
+        return returnNode;
+    }
+
+    public List<Node> getTrees() {
+        return trees;
     }
 
     /**
@@ -203,7 +234,7 @@ public class Network {
 
     private int getTree(IP tag) {
         for (int i = 0; i < trees.size(); i++) {
-            dfs(trees.get(i));
+            doDFS(trees.get(i));
             List<Node> curr = dfsTree;
             for (Node node : curr) {
                 if (node.getTag().compareTo(tag) == 0) {

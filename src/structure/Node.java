@@ -137,6 +137,13 @@ public class Node {
         this.connections.add(connection);
     }
 
+    public void addAllConnections( List<Node> connections) {
+        for (Node node: connections) {
+            this.connections.add(node);
+            gradiant++;
+        }
+    }
+
     /**
      * Gets upper node.
      *
