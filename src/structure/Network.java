@@ -137,14 +137,31 @@ public class Network {
         Node treeOne = this.trees.get(getTree(ip1));
         Node treeTwo = this.trees.get(getTree(ip2));
         if (treeOne.isRoot()) {
-            treeOne.setAllUpperNodes(treeTwo);
-            treeTwo.addConnection(treeOne);
-            return true;
+            doDFS(treeTwo);
+            if (!containsIP(this.dfsTree, ip1)) {
+                treeOne.setAllUpperNodes(treeTwo);
+                treeTwo.addConnection(treeOne);
+                this.trees.set(getTree(ip2), treeTwo);
+                return true;
+            }
         }
         else if (treeTwo.isRoot()) {
-            treeTwo.setAllUpperNodes(treeOne);
-            treeOne.addConnection(treeTwo);
-            return true;
+            doDFS(treeOne);
+            if (!containsIP(this.dfsTree, ip2)) {
+                treeTwo.setAllUpperNodes(treeOne);
+                treeOne.addConnection(treeTwo);
+                this.trees.set(getTree(ip1), treeOne);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsIP(List<Node> tree, IP ip) {
+        for (Node node: tree) {
+            if (node.getTag().equals(ip)) {
+                return true;
+            }
         }
         return false;
     }
