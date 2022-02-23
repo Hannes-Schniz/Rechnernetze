@@ -38,25 +38,23 @@ public class Network {
     public Network(final String bracketNotation) throws ParseException {
         this.trees = new ArrayList<>();
         String[] layers = Parser.parseToTree(bracketNotation);
-        String[] currLayer = Parser.pointNotation(layers[0]);
-        Node pointer = new Node(new IP(currLayer[0]), currLayer.length - 1, true, new ArrayList<>(), null);
-        for (int i = 1; i < currLayer.length; i++) {
-            pointer.addConnection(new Node(new IP(currLayer[i]), 1, false, new ArrayList<>(), pointer));
-        }
-        for (int i = 1; i < layers.length; i++) {
-            currLayer = Parser.pointNotation(layers[i]);
-            int pos = pointer.hasConnection(new IP(currLayer[0]));
-            while (pos < 0) {
-                pointer = pointer.getUpperNode();
-                pos = pointer.hasConnection(new IP(currLayer[0]));
-            }
-            List<Node> toChangeList = pointer.getConnections().get(i).getConnections();
+        for (int i = 0; i < layers.length; i++) {
+            String[] currLayer = Parser.pointNotation(layers[i]);
+            Node pointer = new Node(new IP(currLayer[0]), currLayer.length - 1, false, new ArrayList<>(), null);
             for (int j = 1; j < currLayer.length; j++) {
-                toChangeList.add(new Node(new IP(currLayer[j]), 1,  false, new ArrayList<>(), null));
+                pointer.addConnection(new Node(new IP(currLayer[j]), 1, false, new ArrayList<>(), pointer));
             }
-            pointer = pointer.getConnections().get(pos);
+            if (i == 0) {
+                this.trees.add(pointer);
+                this.trees.get(i).setRoot(true);
+            }
+            else {
+                Node toEdit = findNode(this.trees.get(0), pointer.getTag());
+                for (Node node: pointer.getConnections()) {
+                    editNode(toEdit, node);
+                }
+            }
         }
-        this.trees.add(shiftTop(pointer));
     }
 
     private Node shiftTop(Node input) {
@@ -75,33 +73,51 @@ public class Network {
      */
     public boolean add(final Network subnet) {
         boolean returnBool = false;
-        for (Node inputTree: subnet.getTrees()) {
-            doDFS(inputTree);
-            List<Node> inputDFSTree = this.dfsTree;
-            for (Node node: inputDFSTree) {
-                int pos = getTree(node.getTag());
-                if (pos >= 0) {
-                    Node treeNode = findNode(trees.get(pos), node.getTag());
-                    treeNode.addAllConnections(node.getConnections());
-                    treeNode = shiftTop(treeNode);
-                    trees.set(pos, treeNode);
-                    returnBool = true;
-                    break;
+        List<Node> oldTrees = new ArrayList<>();
+        oldTrees.addAll(trees);
+        for (Node subnetNode: subnet.getTrees()) {
+            this.trees.add(subnetNode);
+            for (int i = 0; i < oldTrees.size(); i++) {
+                doDFS(oldTrees.get(i));
+                for (int j = 0; j < this.dfsTree.size(); j++) {
+                    if (this.dfsTree.get(j).getTag().compareTo(subnetNode.getTag()) == 0) {
+                        for (Node node: subnetNode.getConnections()) {
+                            connect(this.dfsTree.get(j).getTag(), node.getTag());
+                        }
+                        returnBool = true;
+                        this.trees.remove(subnetNode);
+                        break;
+                    }
                 }
             }
         }
         return returnBool;
+        //boolean returnBool = false;
+        //for (Node inputTree: subnet.getTrees()) {
+        //    doDFS(inputTree);
+        //    for (Node node: this.dfsTree) {
+        //        int pos = getTree(node.getTag());
+        //        if (pos >= 0) {
+        //            Node treeNode = findNode(trees.get(pos), node.getTag());
+        //            treeNode.addAllConnections(node.getConnections());
+        //            treeNode = shiftTop(treeNode);
+        //            trees.set(pos, treeNode);
+        //            returnBool = true;
+        //            break;
+        //        }
+        //    }
+        //}
+        //return returnBool;
     }
 
     private Node findNode(Node tree, IP tag) {
-        Node returnNode = null;
-        if (tree.getTag().compareTo(tag) == 0) {
-            return tree;
+        doDFS(tree);
+        for (Node node: this.dfsTree) {
+            if (node.getTag().compareTo(tag) == 0) {
+                return node;
+            }
         }
-        for (Node node: tree.getConnections()) {
-            returnNode = findNode(node, tag);
-        }
-        return returnNode;
+        return null;
     }
 
     public List<Node> getTrees() {
@@ -134,27 +150,21 @@ public class Network {
      * @return the boolean
      */
     public boolean connect(final IP ip1, final IP ip2) {
-        Node treeOne = this.trees.get(getTree(ip1));
-        Node treeTwo = this.trees.get(getTree(ip2));
-        if (treeOne.isRoot()) {
-            doDFS(treeTwo);
-            if (!containsIP(this.dfsTree, ip1)) {
-                treeOne.setAllUpperNodes(treeTwo);
-                treeTwo.addConnection(treeOne);
-                this.trees.set(getTree(ip2), treeTwo);
-                return true;
-            }
-        }
-        else if (treeTwo.isRoot()) {
-            doDFS(treeOne);
-            if (!containsIP(this.dfsTree, ip2)) {
-                treeTwo.setAllUpperNodes(treeOne);
-                treeOne.addConnection(treeTwo);
-                this.trees.set(getTree(ip1), treeOne);
-                return true;
-            }
+        Node treeOne = findNode(this.trees.get(getTree(ip1)), ip1);
+        Node treeTwo = findNode(this.trees.get(getTree(ip2)), ip2);
+        doDFS(treeTwo);
+        if (!containsIP(this.dfsTree, ip1)) {
+            editNode(treeOne, treeTwo);
+            return true;
         }
         return false;
+    }
+
+    private void editNode(Node target, Node toAdd) {
+        toAdd.setUpperNode(target);
+        target.addConnection(toAdd);
+        Node root = shiftTop(target);
+        this.trees.set(getTree(root.getTag()), root);
     }
 
     private boolean containsIP(List<Node> tree, IP ip) {
