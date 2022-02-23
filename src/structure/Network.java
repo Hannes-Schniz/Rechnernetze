@@ -73,8 +73,7 @@ public class Network {
      */
     public boolean add(final Network subnet) {
         boolean returnBool = false;
-        List<Node> oldTrees = new ArrayList<>();
-        oldTrees.addAll(trees);
+        List<Node> oldTrees = new ArrayList<>(trees);
         for (Node subnetNode: subnet.getTrees()) {
             this.trees.add(subnetNode);
             for (int i = 0; i < oldTrees.size(); i++) {
@@ -82,11 +81,12 @@ public class Network {
                 for (int j = 0; j < this.dfsTree.size(); j++) {
                     if (this.dfsTree.get(j).getTag().compareTo(subnetNode.getTag()) == 0) {
                         for (Node node: subnetNode.getConnections()) {
-                            connect(this.dfsTree.get(j).getTag(), node.getTag());
+                            if (this.dfsTree.get(j).hasConnection(node.getTag()) == -1) {
+                                connect(this.dfsTree.get(j).getTag(), node.getTag());
+                                returnBool = true;
+                            }
                         }
-                        returnBool = true;
                         this.trees.remove(subnetNode);
-                        break;
                     }
                 }
             }
