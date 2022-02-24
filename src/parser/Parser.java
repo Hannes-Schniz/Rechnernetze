@@ -1,5 +1,7 @@
 package src.parser;
 
+import java.util.List;
+
 /**
  * The type Parser.
  * @author Hannes Schniz
@@ -62,6 +64,10 @@ public class Parser {
             }
         }
         return parsedInput;
+    }
+
+    public static String parseToBracket(List<String> input) {
+
     }
 
     public static String[] pointNotation(String bracketIPs) throws ParseException {
