@@ -67,7 +67,7 @@ public class Parser {
     }
 
     public static String parseToBracket(List<String> input) {
-
+        return null;
     }
 
     public static String[] pointNotation(String bracketIPs) throws ParseException {
