@@ -126,7 +126,9 @@ public class Node {
      */
     public void initNewConnections(List<IP> connections) {
         for (IP connection : connections) {
-            this.connections.add(new Node(connection));
+            Node node = new Node(connection, 1, false, new ArrayList<>(), this);
+            node.setLayer(this.layer + 1);
+            this.connections.add(node);
         }
         this.setGradiant(connections.size());
     }
@@ -222,5 +224,11 @@ public class Node {
             }
         }
         return -1;
+    }
+
+    public void correctLayers() {
+        for (Node node: this.connections) {
+            node.setLayer(this.layer + 1);
+        }
     }
 }

@@ -26,7 +26,6 @@ public class Network {
         this.trees.add(new Node(root, children.size(), true, new ArrayList<>(), null));
         this.trees.get(first).initNewConnections(children);
         this.trees.get(first).setAllUpperNodes(this.trees.get(first));
-        this.dfsTree = new ArrayList<>();
     }
 
     /**
@@ -43,6 +42,7 @@ public class Network {
             Node pointer = new Node(new IP(currLayer[0]), currLayer.length - 1, false, new ArrayList<>(), null);
             for (int j = 1; j < currLayer.length; j++) {
                 pointer.addConnection(new Node(new IP(currLayer[j]), 1, false, new ArrayList<>(), pointer));
+                pointer.correctLayers();
             }
             if (i == 0) {
                 this.trees.add(pointer);
@@ -60,6 +60,7 @@ public class Network {
     private Node shiftTop(Node input) {
         Node root = input;
         while (!root.isRoot()) {
+            root.correctLayers();
             root = root.getUpperNode();
         }
         return root;
@@ -86,7 +87,8 @@ public class Network {
                 while (!this.dfsTree.containsAll(dfs)) {
                     if (!containsIP(this.dfsTree, dfs.get(i).getTag())) {
                         if (containsIP(this.dfsTree, dfs.get(i).getUpperNode().getTag())) {
-                            editNode(findNode(subnet.getTrees().get(pos), dfs.get(i).getUpperNode().getTag()), dfs.get(i));
+                            editNode(findNode(subnet.getTrees().get(pos),
+                                    dfs.get(i).getUpperNode().getTag()), dfs.get(i));
                         }
                     }
                     i++;
@@ -182,6 +184,7 @@ public class Network {
 
     private void editNode(Node target, Node toAdd) {
         toAdd.setUpperNode(target);
+        toAdd.setLayer(target.getLayer() + 1);
         target.addConnection(toAdd);
         Node root = shiftTop(target);
         this.trees.set(getTree(this.trees, root.getTag()), root);
@@ -225,13 +228,15 @@ public class Network {
      */
     public int getHeight(final IP root) {
         int currMaxHeight = first;
-        if (contains(root)) {
-            doDFS(this.trees.get(getTree(this.trees, root)));
+        if (list().contains(root)) {
+            Node treeNode = findNode(this.trees.get(getTree(this.trees, root)), root);
+            doDFS(treeNode);
             for (Node node: dfsTree) {
                 if (currMaxHeight < node.getLayer()) {
                     currMaxHeight = node.getLayer();
                 }
             }
+            currMaxHeight = currMaxHeight - treeNode.getLayer();
         }
         return currMaxHeight;
     }
