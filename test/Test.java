@@ -35,6 +35,7 @@ public class Test {
         // true
         System.out.println(network.add(new Network("(231.189.0.127 252.29.23.0"
                                 + " 116.132.83.77 39.20.222.120 77.135.84.171)")));
+        System.out.println(network.toString(root));
         // "Change" root and call toString, getHeight and getLevels again
         root = new IP("85.193.148.81");
         levels = List.of(List.of(root),

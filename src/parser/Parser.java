@@ -67,7 +67,16 @@ public class Parser {
     }
 
     public static String parseToBracket(List<String> input) {
-        return null;
+        StringBuilder output = new StringBuilder();
+        for (String string: input) {
+            if (output.toString().equals("")) {
+                output.append("(").append(string);
+            }
+            else {
+                output.append(" ").append(string);
+            }
+        }
+        return String.valueOf(output.append(")"));
     }
 
     public static String[] pointNotation(String bracketIPs) throws ParseException {

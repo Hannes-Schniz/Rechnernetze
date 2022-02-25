@@ -73,11 +73,22 @@ public class Network {
      */
     public boolean add(final Network subnet) {
         boolean returnBool = false;
+        for (Node tree: this.trees) {
+            doDFS(tree);
+            int pos = getTree(subnet.getTrees(), tree.getTag());
+            if (pos >= 0) {
+                Node toEdit = findNode(subnet.getTrees().get(pos), tree.getTag());
+                toEdit.addAllConnections(tree.getConnections());
+                this.trees.set(getTree(this.trees, tree.getTag()), shiftTop(toEdit));
+                this.trees.remove(tree);
+                returnBool = true;
+            }
+        }
         for (Node tree: subnet.getTrees()) {
             doDFS(tree);
             List<Node> inputDFS = new ArrayList<>(this.dfsTree);
             int i = 0;
-            int pos = getTree(inputDFS.get(i).getTag());
+            int pos = getTree(this.trees, inputDFS.get(i).getTag());
             if (pos >= 0) {
                 doDFS(this.trees.get(pos));
                 while (!this.dfsTree.containsAll(inputDFS)) {
@@ -93,6 +104,9 @@ public class Network {
                         break;
                     }
                 }
+            }
+            else {
+                this.trees.add(tree);
             }
         }
         return returnBool;
@@ -138,8 +152,8 @@ public class Network {
      * @return the boolean
      */
     public boolean connect(final IP ip1, final IP ip2) {
-        Node treeOne = findNode(this.trees.get(getTree(ip1)), ip1);
-        Node treeTwo = findNode(this.trees.get(getTree(ip2)), ip2);
+        Node treeOne = findNode(this.trees.get(getTree(this.trees, ip1)), ip1);
+        Node treeTwo = findNode(this.trees.get(getTree(this.trees, ip2)), ip2);
         doDFS(treeTwo);
         if (!containsIP(this.dfsTree, ip1)) {
             editNode(treeOne, treeTwo);
@@ -152,7 +166,7 @@ public class Network {
         toAdd.setUpperNode(target);
         target.addConnection(toAdd);
         Node root = shiftTop(target);
-        this.trees.set(getTree(root.getTag()), root);
+        this.trees.set(getTree(this.trees, root.getTag()), root);
     }
 
     private boolean containsIP(List<Node> tree, IP ip) {
@@ -194,7 +208,7 @@ public class Network {
     public int getHeight(final IP root) {
         int currMaxHeight = first;
         if (contains(root)) {
-            doDFS(this.trees.get(getTree(root)));
+            doDFS(this.trees.get(getTree(this.trees, root)));
             for (Node node: dfsTree) {
                 if (currMaxHeight < node.getLayer()) {
                     currMaxHeight = node.getLayer();
@@ -232,16 +246,32 @@ public class Network {
      * @return the string
      */
     public String toString(IP root) {
-        List<Node> found = new ArrayList<>();
-        Node rootNode = this.trees.get(getTree(root));
-        doDFS(rootNode);
-        while (!found.containsAll(this.dfsTree)) {
-            found.add(rootNode);
-            if (rootNode.getConnections() != null) {
+        List<List<IP>> layers = new ArrayList<>();
+        Node rootNode = this.trees.get(getTree(this.trees, root));
+        String hell = recPrint("", rootNode);
+        //doDFS(rootNode);
+        //for (Node node: this.dfsTree) {
+        //    layers.add(node.getLayerIPs());
+        //}
+        //List<String> working = new ArrayList<>();
+        //String output = "";
+        //for (int i = layers.size() - 1; i > 1; i++) {
+        //    if (layers.get(i).size() > 1) {
+        //        layers.set(i, sortList(layers.get(i)));
+        //        for (IP address: layers.get(i)) {
+        //            working.add(Parser.parseToString(address.getAddress()));
+        //        }
+//
+        //    }
+        //}
+        return hell;
+    }
 
-            }
+    private String recPrint(String output, Node node) {
+        for (Node connection: node.getConnections()) {
+            return recPrint(Parser.parseToBracket(node.getLayerIPs()), connection);
         }
-        return null;
+        return output;
     }
 
     private void doDFS(Node tree) {
@@ -256,7 +286,7 @@ public class Network {
         }
     }
 
-    private int getTree(IP tag) {
+    private int getTree(List<Node> trees, IP tag) {
         for (int i = 0; i < trees.size(); i++) {
             doDFS(trees.get(i));
             List<Node> curr = dfsTree;

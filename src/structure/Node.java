@@ -1,5 +1,7 @@
 package src.structure;
 
+import src.parser.Parser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,9 +140,14 @@ public class Node {
     }
 
     public void addAllConnections( List<Node> connections) {
+        if (connections == null) {
+            return;
+        }
         for (Node node: connections) {
-            this.connections.add(node);
-            gradiant++;
+            if (!this.connections.contains(node)) {
+                this.connections.add(node);
+                gradiant++;
+            }
         }
     }
 
@@ -180,6 +187,18 @@ public class Node {
      */
     public int getLayer() {
         return layer;
+    }
+
+    public List<String> getLayerIPs() {
+        List<String> layer = new ArrayList<>();
+        if (this.connections != null) {
+            layer.add(Parser.parseToString(this.tag.getAddress()));
+            for (Node connection: this.connections) {
+                layer.add(Parser.parseToString(connection.getTag().getAddress()));
+            }
+            return layer;
+        }
+        return null;
     }
 
     /**
