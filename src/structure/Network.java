@@ -13,7 +13,6 @@ public class Network {
 
     private final int first = 0;
     private List<Node> trees;
-    private List<Node> dfsTree;
 
     /**
      * Instantiates a new Network.
@@ -77,22 +76,22 @@ public class Network {
         List<Node> oldTrees = new ArrayList<>(this.trees);
         for (Node tree: oldTrees) {
             boolean edited = false;
-            doDFS(tree);
-            List<Node> dfs = new ArrayList<>(this.dfsTree);
+            List<Node> dfsTree = dfs(tree, new ArrayList<>());
+            List<Node> dfs = new ArrayList<>(dfsTree);
             int i = 0;
             int pos = getTree(subnet.getTrees(), dfs.get(i).getTag());
             if (pos >= 0) {
                 this.trees.add(subnet.getTrees().get(pos));
-                doDFS(subnet.getTrees().get(pos));
-                while (!this.dfsTree.containsAll(dfs)) {
-                    if (!containsIP(this.dfsTree, dfs.get(i).getTag())) {
-                        if (containsIP(this.dfsTree, dfs.get(i).getUpperNode().getTag())) {
+                 dfsTree = dfs(subnet.getTrees().get(pos), new ArrayList<>());
+                while (!dfsTree.containsAll(dfs)) {
+                    if (!containsIP(dfsTree, dfs.get(i).getTag())) {
+                        if (containsIP(dfsTree, dfs.get(i).getUpperNode().getTag())) {
                             editNode(findNode(subnet.getTrees().get(pos),
                                     dfs.get(i).getUpperNode().getTag()), dfs.get(i));
                         }
                     }
                     i++;
-                    doDFS(subnet.getTrees().get(pos));
+                    dfsTree= dfs(subnet.getTrees().get(pos), new ArrayList<>());
                     returnBool = true;
                     edited = true;
                     if (i == dfs.size()) {
@@ -105,20 +104,19 @@ public class Network {
             }
         }
         for (Node tree: subnet.getTrees()) {
-            doDFS(tree);
-            List<Node> inputDFS = new ArrayList<>(this.dfsTree);
+            List<Node> inputDFS = dfs(tree, new ArrayList<>());
             int i = 0;
             int pos = getTree(this.trees, inputDFS.get(i).getTag());
             if (pos >= 0) {
-                doDFS(this.trees.get(pos));
-                while (!this.dfsTree.containsAll(inputDFS)) {
-                    if (!containsIP(this.dfsTree, inputDFS.get(i).getTag())) {
-                        if (containsIP(this.dfsTree, inputDFS.get(i).getUpperNode().getTag())) {
+                List<Node> dfsTree = dfs(this.trees.get(pos), new ArrayList<>());
+                while (!dfsTree.containsAll(inputDFS)) {
+                    if (!containsIP(dfsTree, inputDFS.get(i).getTag())) {
+                        if (containsIP(dfsTree, inputDFS.get(i).getUpperNode().getTag())) {
                             editNode(findNode(this.trees.get(pos), inputDFS.get(i).getUpperNode().getTag()), inputDFS.get(i));
                         }
                     }
                     i++;
-                    doDFS(this.trees.get(pos));
+                    dfsTree = dfs(this.trees.get(pos), new ArrayList<>());
                     returnBool = true;
                     if (i == inputDFS.size()) {
                         break;
@@ -133,8 +131,8 @@ public class Network {
     }
 
     private Node findNode(Node tree, IP tag) {
-        doDFS(tree);
-        for (Node node: this.dfsTree) {
+        List<Node> dfsTree = dfs(tree, new ArrayList<>());
+        for (Node node: dfsTree) {
             if (node.getTag().compareTo(tag) == 0) {
                 return node;
             }
@@ -154,8 +152,7 @@ public class Network {
     public List<IP> list() {
         List<Node> foundList = new ArrayList<>();
         for (Node tree : trees) {
-            doDFS(tree);
-            foundList.addAll(dfsTree);
+            foundList.addAll(dfs(tree, new ArrayList<>()));
         }
         List<IP> returnValues = new ArrayList<>();
         for (Node found: foundList) {
@@ -174,8 +171,8 @@ public class Network {
     public boolean connect(final IP ip1, final IP ip2) {
         Node treeOne = findNode(this.trees.get(getTree(this.trees, ip1)), ip1);
         Node treeTwo = findNode(this.trees.get(getTree(this.trees, ip2)), ip2);
-        doDFS(treeTwo);
-        if (!containsIP(this.dfsTree, ip1)) {
+        List<Node> dfsTree = dfs(treeTwo, new ArrayList<>());
+        if (!containsIP(dfsTree, ip1)) {
             editNode(treeOne, treeTwo);
             return true;
         }
@@ -188,6 +185,10 @@ public class Network {
         target.addConnection(toAdd);
         Node root = shiftTop(target);
         this.trees.set(getTree(this.trees, root.getTag()), root);
+    }
+
+    private boolean hasCircle(Node tree, Node toAdd) {
+        return false;
     }
 
     private boolean containsIP(List<Node> tree, IP ip) {
@@ -230,7 +231,7 @@ public class Network {
         int currMaxHeight = first;
         if (list().contains(root)) {
             Node treeNode = findNode(this.trees.get(getTree(this.trees, root)), root);
-            doDFS(treeNode);
+            List<Node> dfsTree = dfs(treeNode, new ArrayList<>());
             for (Node node: dfsTree) {
                 if (currMaxHeight < node.getLayer()) {
                     currMaxHeight = node.getLayer();
@@ -305,23 +306,18 @@ public class Network {
         return output;
     }
 
-    private void doDFS(Node tree) {
-        this.dfsTree = new ArrayList<>();
-        dfs(tree);
-    }
-
-    private void dfs(Node tree) {
-        dfsTree.add(tree);
+    private List<Node> dfs(Node tree, List<Node> input) {
+        input.add(tree);
         for (Node node: tree.getConnections()) {
-            dfs(node);
+            dfs(node, input);
         }
+        return input;
     }
 
     private int getTree(List<Node> trees, IP tag) {
         for (int i = 0; i < trees.size(); i++) {
-            doDFS(trees.get(i));
-            List<Node> curr = dfsTree;
-            for (Node node : curr) {
+            List<Node> dfsTree = dfs(trees.get(i), new ArrayList<>());
+            for (Node node : dfsTree) {
                 if (node.getTag().compareTo(tag) == 0) {
                     return i;
                 }
