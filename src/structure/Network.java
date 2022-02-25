@@ -77,14 +77,25 @@ public class Network {
         for (Node tree: oldTrees) {
             boolean edited = false;
             doDFS(tree);
-            for (Node dfs: this.dfsTree) {
-                int pos = getTree(subnet.getTrees(), dfs.getTag());
-                if (pos >= 0) {
-                    Node toEdit = findNode(subnet.getTrees().get(pos), dfs.getTag());
-                    toEdit.addAllConnections(dfs.getConnections());
-                    this.trees.set(getTree(this.trees, tree.getTag()), shiftTop(toEdit));
+            List<Node> dfs = new ArrayList<>(this.dfsTree);
+            int i = 0;
+            int pos = getTree(subnet.getTrees(), dfs.get(i).getTag());
+            if (pos >= 0) {
+                this.trees.add(subnet.getTrees().get(pos));
+                doDFS(subnet.getTrees().get(pos));
+                while (!this.dfsTree.containsAll(dfs)) {
+                    if (!containsIP(this.dfsTree, dfs.get(i).getTag())) {
+                        if (containsIP(this.dfsTree, dfs.get(i).getUpperNode().getTag())) {
+                            editNode(findNode(subnet.getTrees().get(pos), dfs.get(i).getUpperNode().getTag()), dfs.get(i));
+                        }
+                    }
+                    i++;
+                    doDFS(subnet.getTrees().get(pos));
                     returnBool = true;
                     edited = true;
+                    if (i == dfs.size()) {
+                        break;
+                    }
                 }
             }
             if (edited) {
