@@ -73,14 +73,22 @@ public class Network {
      */
     public boolean add(final Network subnet) {
         boolean returnBool = false;
-        for (Node tree: this.trees) {
-            int pos = getTree(subnet.getTrees(), tree.getTag());
-            if (pos >= 0) {
-                Node toEdit = findNode(subnet.getTrees().get(pos), tree.getTag());
-                toEdit.addAllConnections(tree.getConnections());
-                this.trees.set(getTree(this.trees, tree.getTag()), shiftTop(toEdit));
+        List<Node> oldTrees = new ArrayList<>(this.trees);
+        for (Node tree: oldTrees) {
+            boolean edited = false;
+            doDFS(tree);
+            for (Node dfs: this.dfsTree) {
+                int pos = getTree(subnet.getTrees(), dfs.getTag());
+                if (pos >= 0) {
+                    Node toEdit = findNode(subnet.getTrees().get(pos), dfs.getTag());
+                    toEdit.addAllConnections(dfs.getConnections());
+                    this.trees.set(getTree(this.trees, tree.getTag()), shiftTop(toEdit));
+                    returnBool = true;
+                    edited = true;
+                }
+            }
+            if (edited) {
                 this.trees.remove(tree);
-                returnBool = true;
             }
         }
         for (Node tree: subnet.getTrees()) {
@@ -245,26 +253,8 @@ public class Network {
      * @return the string
      */
     public String toString(IP root) {
-        List<List<IP>> layers = new ArrayList<>();
         Node rootNode = this.trees.get(getTree(this.trees, root));
-        doDFS(rootNode);
-        String hell = recPrint("", rootNode);
-        //doDFS(rootNode);
-        //for (Node node: this.dfsTree) {
-        //    layers.add(node.getLayerIPs());
-        //}
-        //List<String> working = new ArrayList<>();
-        //String output = "";
-        //for (int i = layers.size() - 1; i > 1; i++) {
-        //    if (layers.get(i).size() > 1) {
-        //        layers.set(i, sortList(layers.get(i)));
-        //        for (IP address: layers.get(i)) {
-        //            working.add(Parser.parseToString(address.getAddress()));
-        //        }
-//
-        //    }
-        //}
-        return hell;
+        return recPrint("", rootNode);
     }
 
     private String recPrint(String output, Node node) {

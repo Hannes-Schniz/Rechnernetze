@@ -144,9 +144,14 @@ public class Node {
             return;
         }
         for (Node node: connections) {
-            if (!this.connections.contains(node)) {
+            boolean notFound = true;
+            for (Node connection: this.connections) {
+                if (node.getTag().compareTo(connection.getTag()) == 0) {
+                    notFound = false;
+                }
+            }
+            if (notFound) {
                 this.connections.add(node);
-                gradiant++;
             }
         }
     }
