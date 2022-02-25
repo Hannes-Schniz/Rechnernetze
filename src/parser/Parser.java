@@ -19,7 +19,7 @@ public class Parser {
         for (int i : input) {
             returnValue = returnValue.concat(i + ".");
         }
-        return returnValue;
+        return returnValue.substring(0, returnValue.length() - 1);
     }
 
     /**

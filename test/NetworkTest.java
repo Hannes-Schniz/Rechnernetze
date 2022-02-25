@@ -46,9 +46,10 @@ class NetworkTest {
     void add() {
         testNetwork.add(addNetwork);
         testNetwork.add(stress);
-        List<IP> networkList = testNetwork.list();
-        for (IP ip: networkList) {
-            System.out.println(ip.toString());
+        try {
+            System.out.println(testNetwork.toString(new IP("85.193.148.81")));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 

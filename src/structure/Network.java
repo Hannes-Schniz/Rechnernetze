@@ -74,7 +74,6 @@ public class Network {
     public boolean add(final Network subnet) {
         boolean returnBool = false;
         for (Node tree: this.trees) {
-            doDFS(tree);
             int pos = getTree(subnet.getTrees(), tree.getTag());
             if (pos >= 0) {
                 Node toEdit = findNode(subnet.getTrees().get(pos), tree.getTag());
@@ -248,6 +247,7 @@ public class Network {
     public String toString(IP root) {
         List<List<IP>> layers = new ArrayList<>();
         Node rootNode = this.trees.get(getTree(this.trees, root));
+        doDFS(rootNode);
         String hell = recPrint("", rootNode);
         //doDFS(rootNode);
         //for (Node node: this.dfsTree) {
@@ -268,8 +268,33 @@ public class Network {
     }
 
     private String recPrint(String output, Node node) {
-        for (Node connection: node.getConnections()) {
-            return recPrint(Parser.parseToBracket(node.getLayerIPs()), connection);
+        List<String> toParse = new ArrayList<>();
+        toParse.add(Parser.parseToString(node.getTag().getAddress()));
+        if (node.getConnections().size() > 0) {
+            List<Node> sortedConnections = sortNodes(node.getConnections());
+            for (Node connection: sortedConnections) {
+                toParse.add(recPrint(Parser.parseToBracket(node.getLayerIPs()), connection));
+            }
+            return Parser.parseToBracket(toParse);
+        }
+        else {
+            return toParse.get(0);
+        }
+    }
+
+    private List<Node> sortNodes(List<Node> input) {
+        List<IP> sortedIPs = new ArrayList<>();
+        List<Node> output = new ArrayList<>();
+        for (Node node: input) {
+            sortedIPs.add(node.getTag());
+        }
+        sortedIPs = sortList(sortedIPs);
+        for (IP ip: sortedIPs) {
+            for (Node node:input) {
+                if (node.getTag().compareTo(ip) == 0) {
+                    output.add(node);
+                }
+            }
         }
         return output;
     }

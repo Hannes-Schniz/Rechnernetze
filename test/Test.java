@@ -45,11 +45,10 @@ public class Test {
                         new IP("77.135.84.171"), new IP("116.132.83.77"),
                         new IP("122.117.67.158"), new IP("252.29.23.0")));
         // true
-        System.out.println(
-                "(85.193.148.81 34.49.145.239 (141.255.1.133 0.146.197.108"
-                        + " 122.117.67.158) (231.189.0.127 39.20.222.120"
-                        + " 77.135.84.171 116.132.83.77 252.29.23.0))"
-                        .equals(network.toString(root)));
+        String compare = "(85.193.148.81 34.49.145.239 (141.255.1.133 0.146.197.108"
+                + " 122.117.67.158) (231.189.0.127 39.20.222.120"
+                + " 77.135.84.171 116.132.83.77 252.29.23.0))";
+        System.out.println(compare.equals(network.toString(root)));
         // true
         System.out.println((levels.size() - 1) == network.getHeight(root));
         // true
