@@ -196,12 +196,20 @@ public class Node {
         return layer;
     }
 
-    public List<String> getLayerIPs() {
-        List<String> layer = new ArrayList<>();
+    public List<String> getLayerNodes() {
+        List<String> output = new ArrayList<>();
+        for (IP ip: getLayerIps()) {
+            output.add(Parser.parseToString(ip.getAddress()));
+        }
+        return output;
+    }
+
+    public List<IP> getLayerIps() {
+        List<IP> layer = new ArrayList<>();
         if (this.connections != null) {
-            layer.add(Parser.parseToString(this.tag.getAddress()));
+            layer.add(this.tag);
             for (Node connection: this.connections) {
-                layer.add(Parser.parseToString(connection.getTag().getAddress()));
+                layer.add(connection.getTag());
             }
             return layer;
         }

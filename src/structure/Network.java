@@ -82,7 +82,7 @@ public class Network {
             int pos = getTree(subnet.getTrees(), dfs.get(i).getTag());
             if (pos >= 0) {
                 this.trees.add(subnet.getTrees().get(pos));
-                 dfsTree = dfs(subnet.getTrees().get(pos), new ArrayList<>());
+                dfsTree = dfs(subnet.getTrees().get(pos), new ArrayList<>());
                 while (!dfsTree.containsAll(dfs)) {
                     if (!containsIP(dfsTree, dfs.get(i).getTag())) {
                         if (containsIP(dfsTree, dfs.get(i).getUpperNode().getTag())) {
@@ -91,7 +91,7 @@ public class Network {
                         }
                     }
                     i++;
-                    dfsTree= dfs(subnet.getTrees().get(pos), new ArrayList<>());
+                    dfsTree = dfs(subnet.getTrees().get(pos), new ArrayList<>());
                     returnBool = true;
                     edited = true;
                     if (i == dfs.size()) {
@@ -249,7 +249,42 @@ public class Network {
      * @return the levels
      */
     public List<List<IP>> getLevels(final IP root) {
-        return null;
+        int pos = getTree(this.trees, root);
+        List<List<IP>> output = new ArrayList<>();
+        if (pos >= 0) {
+            Node tree = findNode(this.trees.get(pos), root);
+            List<IP> insert = new ArrayList<>();
+            List<Node> dfs = dfs(tree, new ArrayList<>());
+            int curr = 0;
+            for (Node node: sortByLayer(dfs)) {
+                if (curr != node.getLayer()) {
+                    curr++;
+                    output.add(sortList(insert));
+                    insert = new ArrayList<>();
+                }
+                insert.add(node.getTag());
+            }
+            output.add(sortList(insert));
+
+        }
+        return output;
+    }
+
+    private List<Node> sortByLayer(List<Node> input) {
+        List<Node> output = new ArrayList<>();
+        int i = 0;
+        int layer = 0;
+        while (!output.containsAll(input)) {
+            if (i == input.size()) {
+                i = 0;
+                layer = layer + 1;
+            }
+            if (input.get(i).getLayer() == layer) {
+                output.add(input.get(i));
+            }
+            i = i + 1;
+        }
+        return output;
     }
 
     /**
@@ -280,7 +315,7 @@ public class Network {
         if (node.getConnections().size() > 0) {
             List<Node> sortedConnections = sortNodes(node.getConnections());
             for (Node connection: sortedConnections) {
-                toParse.add(recPrint(Parser.parseToBracket(node.getLayerIPs()), connection));
+                toParse.add(recPrint(Parser.parseToBracket(node.getLayerNodes()), connection));
             }
             return Parser.parseToBracket(toParse);
         }
