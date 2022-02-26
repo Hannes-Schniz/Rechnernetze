@@ -228,18 +228,7 @@ public class Network {
      * @return the height
      */
     public int getHeight(final IP root) {
-        int currMaxHeight = first;
-        if (list().contains(root)) {
-            Node treeNode = findNode(this.trees.get(getTree(this.trees, root)), root);
-            List<Node> dfsTree = dfs(treeNode, new ArrayList<>());
-            for (Node node: dfsTree) {
-                if (currMaxHeight < node.getLayer()) {
-                    currMaxHeight = node.getLayer();
-                }
-            }
-            currMaxHeight = currMaxHeight - treeNode.getLayer();
-        }
-        return currMaxHeight;
+        return getLevels(root).size() - 1;
     }
 
     /**
