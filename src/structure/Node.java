@@ -262,4 +262,5 @@ public class Node {
         }
         setGradiant(grad);
     }
+
 }

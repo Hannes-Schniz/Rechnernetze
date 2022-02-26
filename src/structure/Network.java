@@ -67,6 +67,7 @@ public class Network {
     public boolean add(final Network subnet) {
         boolean returnBool = false;
         List<Node> oldTrees = new ArrayList<>(this.trees);
+        List<Node> newSubnet = new ArrayList<>(subnet.getTrees());
         for (Node tree: oldTrees) {
             boolean edited = false;
             List<Node> dfsTree = tools.dfs(tree, new ArrayList<>());
@@ -94,9 +95,14 @@ public class Network {
             }
             if (edited) {
                 this.trees.remove(tree);
+                if (hasCircle(tree)) {
+                    setTrees(oldTrees);
+                    newSubnet.remove(tree);
+                    returnBool = false;
+                }
             }
         }
-        for (Node tree: subnet.getTrees()) {
+        for (Node tree: newSubnet) {
             List<Node> inputDFS = tools.dfs(tree, new ArrayList<>());
             int i = ZERO;
             int pos = tools.getTree(this.trees, inputDFS.get(i).getTag());
@@ -122,6 +128,10 @@ public class Network {
             }
         }
         return returnBool;
+    }
+
+    public void setTrees(List<Node> trees) {
+        this.trees = trees;
     }
 
     public List<Node> getTrees() {
@@ -171,8 +181,14 @@ public class Network {
         this.trees.set(tools.getTree(this.trees, root.getTag()), root);
     }
 
-    private boolean hasCircle(Node tree, Node toAdd) {
-
+    private boolean hasCircle(Node tree) {
+        List<Node> dfsTree = tools.dfs(tree, new ArrayList<>());
+        for (Node node: dfsTree) {
+            List<Node> currDfs = tools.dfs(node, new ArrayList<>());
+            if (currDfs.containsAll(dfsTree)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -230,7 +246,6 @@ public class Network {
      * @return the height
      */
     public int getHeight(final IP root) {
-        moveRoot(this.trees.get(tools.getTree(this.trees, root)), root);
         return getLevels(root).size() - ONE;
     }
 
@@ -241,11 +256,11 @@ public class Network {
      * @return the levels
      */
     public List<List<IP>> getLevels(final IP root) {
-        moveRoot(this.trees.get(tools.getTree(this.trees, root)), root);
-        int pos = tools.getTree(this.trees, root);
+        List<Node> newTree = new ArrayList<>(moveRoot(this.trees.get(tools.getTree(this.trees, root)), root));
+        int pos = tools.getTree(newTree, root);
         List<List<IP>> output = new ArrayList<>();
         if (pos >= ZERO) {
-            Node tree = tools.findNode(this.trees.get(pos), root);
+            Node tree = tools.findNode(newTree.get(pos), root);
             List<IP> insert = new ArrayList<>();
             List<Node> dfs = tools.dfs(tree, new ArrayList<>());
             int curr = ZERO;
@@ -263,12 +278,14 @@ public class Network {
         return output;
     }
 
-    private void moveRoot(Node tree, IP root) {
-        if (tree.getTag().compareTo(root) != ZERO) {
-            List<IP> path = getRoute(tree.getTag(), root);
+    private List<Node> moveRoot(Node tree, IP root) {
+        List<Node> newTree = new ArrayList<>(this.trees);
+        Node input = tree;
+        if (input.getTag().compareTo(root) != ZERO) {
+            List<IP> path = getRoute(input.getTag(), root);
             List<Node> backwards = new ArrayList<>();
             for (int i = path.size() - ONE; i >= ZERO; i--) {
-                backwards.add(tools.findNode(tree, path.get(i)));
+                backwards.add(tools.findNode(input, path.get(i)));
             }
             Node prev = null;
             for (int i = ZERO; i < backwards.size(); i++) {
@@ -287,8 +304,9 @@ public class Network {
                 backwards.get(i).correctGradiant();
                 prev = backwards.get(i);
             }
-            this.trees.set(tools.getTree(this.trees, tree.getTag()), tools.shiftTop(prev));
+            newTree.set(tools.getTree(newTree, input.getTag()), tools.shiftTop(prev));
         }
+        return newTree;
     }
 
     /**
@@ -332,8 +350,8 @@ public class Network {
      * @return the string
      */
     public String toString(IP root) {
-        moveRoot(this.trees.get(tools.getTree(this.trees, root)), root);
-        Node rootNode = this.trees.get(tools.getTree(this.trees, root));
+        List<Node> newTree = new ArrayList<>(moveRoot(this.trees.get(tools.getTree(this.trees, root)), root));
+        Node rootNode = newTree.get(tools.getTree(newTree, root));
         return tools.recPrint("", rootNode);
     }
 }

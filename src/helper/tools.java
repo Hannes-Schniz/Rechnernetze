@@ -65,7 +65,7 @@ public class tools {
         for (int i = 0; i < trees.size(); i++) {
             List<Node> dfsTree = dfs(trees.get(i), new ArrayList<>());
             for (Node node : dfsTree) {
-                if (node.getTag().compareTo(tag) == ZERO) {
+                if (node.getTag().equals(tag)) {
                     return i;
                 }
             }
