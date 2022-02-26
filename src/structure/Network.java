@@ -208,7 +208,28 @@ public class Network {
      * @return the boolean
      */
     public boolean disconnect(final IP ip1, final IP ip2) {
+        if (contains(ip1) && contains(ip2)) {
+            Node nodeOne = findNode(this.trees.get(getTree(this.trees, ip1)), ip1);
+            Node nodeTwo = findNode(this.trees.get(getTree(this.trees, ip2)), ip2);
+            if (nodeOne.getConnections().contains(nodeTwo)) {
+                disconnectNodes(nodeOne, nodeTwo);
+                return true;
+            }
+            if (nodeTwo.getConnections().contains(nodeOne)) {
+                disconnectNodes(nodeTwo, nodeOne);
+                return true;
+            }
+        }
         return false;
+    }
+
+    private void disconnectNodes(Node source, Node toDisconnect) {
+        List<Node> newConnections = new ArrayList<>(source.getConnections());
+        newConnections.remove(toDisconnect);
+        source.setConnections(newConnections);
+        toDisconnect.setUpperNode(null);
+        this.trees.set(getTree(this.trees, source.getTag()), shiftTop(source));
+        this.trees.add(toDisconnect);
     }
 
     /**
