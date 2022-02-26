@@ -3,6 +3,8 @@ package src.structure;
 import src.parser.ParseException;
 import src.parser.Parser;
 
+import java.util.Arrays;
+
 /**
  * The type Ip.
  * @author Hannes Schniz
@@ -28,8 +30,24 @@ public class IP implements Comparable<IP> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IP ip = (IP) o;
+        return Arrays.equals(address, ip.address);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(address);
+    }
+
+    @Override
     public int compareTo(IP o) {
         int[] toCompare = o.getAddress();
+        if (this.equals(o)) {
+            return 0;
+        }
         for (int i = 0; i < address.length; i++) {
             if (address[i] < toCompare[i]) {
                 return -1;
@@ -38,7 +56,7 @@ public class IP implements Comparable<IP> {
                 return 1;
             }
         }
-        return 0;
+        return 999;
     }
 
     /**

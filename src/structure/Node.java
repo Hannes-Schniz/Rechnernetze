@@ -204,6 +204,15 @@ public class Node {
         return output;
     }
 
+    public void removeConnection(IP toRemove) {
+        for (Node connection: this.getConnections()) {
+            if (connection.getTag().equals(toRemove)) {
+                this.connections.remove(connection);
+                return;
+            }
+        }
+    }
+
     public List<IP> getLayerIps() {
         List<IP> layer = new ArrayList<>();
         if (this.connections != null) {
@@ -235,8 +244,22 @@ public class Node {
     }
 
     public void correctLayers() {
+        if (this.upperNode != null) {
+            this.layer = upperNode.getLayer() + 1;
+        }
+        else {
+            this.layer = 0;
+        }
         for (Node node: this.connections) {
             node.setLayer(this.layer + 1);
         }
+    }
+
+    public void correctGradiant() {
+        int grad = this.connections.size();
+        if (this.upperNode != null) {
+            grad++;
+        }
+        setGradiant(grad);
     }
 }

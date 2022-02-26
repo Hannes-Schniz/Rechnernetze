@@ -188,6 +188,7 @@ public class Network {
     }
 
     private boolean hasCircle(Node tree, Node toAdd) {
+
         return false;
     }
 
@@ -239,7 +240,12 @@ public class Network {
      * @return the boolean
      */
     public boolean contains(final IP ip) {
-        return this.list().contains(ip);
+        for (IP inTrees: list()) {
+            if (inTrees.compareTo(ip) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -249,6 +255,7 @@ public class Network {
      * @return the height
      */
     public int getHeight(final IP root) {
+        moveRoot(this.trees.get(getTree(this.trees, root)), root);
         return getLevels(root).size() - 1;
     }
 
@@ -259,6 +266,7 @@ public class Network {
      * @return the levels
      */
     public List<List<IP>> getLevels(final IP root) {
+        moveRoot(this.trees.get(getTree(this.trees, root)), root);
         int pos = getTree(this.trees, root);
         List<List<IP>> output = new ArrayList<>();
         if (pos >= 0) {
@@ -278,6 +286,34 @@ public class Network {
 
         }
         return output;
+    }
+
+    private void moveRoot(Node tree, IP root) {
+        if (tree.getTag().compareTo(root) != 0) {
+            List<IP> path = getRoute(tree.getTag(), root);
+            List<Node> backwards = new ArrayList<>();
+            for (int i = path.size() - 1; i >= 0; i--) {
+                backwards.add(findNode(tree, path.get(i)));
+            }
+            Node prev = null;
+            for (int i = 0; i < backwards.size(); i++) {
+                if (i != backwards.size() - 1) {
+                    backwards.get(i).addConnection(backwards.get(i).getUpperNode());
+                }
+                backwards.get(i).setUpperNode(prev);
+                if (i > 0) {
+                    backwards.get(i).setRoot(false);
+                    backwards.get(i).removeConnection(prev.getTag());
+                }
+                else {
+                    backwards.get(i).setRoot(true);
+                }
+                backwards.get(i).correctLayers();
+                backwards.get(i).correctGradiant();
+                prev = backwards.get(i);
+            }
+            this.trees.set(getTree(this.trees, tree.getTag()), shiftTop(prev));
+        }
     }
 
     private List<Node> sortByLayer(List<Node> input) {
@@ -305,8 +341,44 @@ public class Network {
      * @return the route
      */
     public List<IP> getRoute(final IP start, final IP end) {
-        return null;
+        if (contains(start) && contains(end) && getTree(this.trees, start) == getTree(this.trees, end)) {
+            Node curr = findNode(this.trees.get(getTree(this.trees, end)), end);
+            List<IP> pathFromEnd = new ArrayList<>();
+            List<IP> pathFromStart = new ArrayList<>();
+            IP target = end;
+            while (!curr.isRoot()) {
+                pathFromEnd.add(curr.getTag());
+                curr = curr.getUpperNode();
+            }
+            pathFromEnd.add(curr.getTag());
+            if (curr.getTag().compareTo(start) != 0) {
+                curr = findNode(this.trees.get(getTree(this.trees, start)), start);
+                while (!containsAny(pathFromEnd, pathFromStart)) {
+                    pathFromStart.add(curr.getTag());
+                    curr = curr.getUpperNode();
+                }
+            }
+            for (int i = pathFromEnd.size() - 1; i >= 0; i--) {
+                if (!pathFromStart.contains(pathFromEnd.get(i))) {
+                    pathFromStart.add(pathFromEnd.get(i));
+                }
+            }
+            return pathFromStart;
+        }
+        return new ArrayList<>();
     }
+
+    private boolean containsAny(List<IP> source, List<IP> contains) {
+        for (IP ip: source) {
+            for (IP ip2: contains) {
+                if (ip.compareTo(ip2) == 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     /**
      * To string string.
@@ -316,6 +388,10 @@ public class Network {
      */
     public String toString(IP root) {
         Node rootNode = this.trees.get(getTree(this.trees, root));
+        if (rootNode.getTag().compareTo(root) != 0) {
+            moveRoot(rootNode, root);
+            rootNode = this.trees.get(getTree(this.trees, root));
+        }
         return recPrint("", rootNode);
     }
 

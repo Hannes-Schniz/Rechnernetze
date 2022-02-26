@@ -2,7 +2,9 @@ package test;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.engine.support.descriptor.FileSystemSource;
 import src.parser.ParseException;
+import src.parser.Parser;
 import src.structure.IP;
 import src.structure.Network;
 
@@ -74,7 +76,14 @@ class NetworkTest {
     }
 
     @Test
-    void getRoute() {
+    void getRoute() throws ParseException {
+        for (IP ip: testNetwork.getRoute(new IP("85.193.148.81"), new IP("116.132.83.77"))) {
+            System.out.println(Parser.parseToString(ip.getAddress()));
+        }
+        System.out.println("--------------------route two--------------------");
+        for (IP ip:testNetwork.getRoute(new IP("0.146.197.108"), new IP("252.29.23.0"))) {
+            System.out.println(Parser.parseToString(ip.getAddress()));
+        }
     }
 
     @Test
