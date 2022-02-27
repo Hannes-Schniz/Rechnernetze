@@ -15,6 +15,7 @@ public class Network {
     private static final int ZERO = 0;
     private static final int ONE = 1;
     private List<Node> trees;
+    private IP originalRoot;
 
     /**
      * Instantiates a new Network.
@@ -24,6 +25,7 @@ public class Network {
      */
     public Network(final IP root, final List<IP> children) {
         this.trees = new ArrayList<>();
+        originalRoot = root;
         this.trees.add(new Node(root, children.size(), true, new ArrayList<>(), null));
         this.trees.get(ZERO).initNewConnections(children);
         this.trees.get(ZERO).setAllUpperNodes(this.trees.get(ZERO));
@@ -48,6 +50,7 @@ public class Network {
             if (i == ZERO) {
                 this.trees.add(pointer);
                 this.trees.get(i).setRoot(true);
+                this.originalRoot = this.trees.get(i).getTag();
             }
             else {
                 Node toEdit = tools.findNode(this.trees.get(ZERO), pointer.getTag());
@@ -94,6 +97,11 @@ public class Network {
             }
             if (edited) {
                 this.trees.remove(tree);
+                if (hasCircle(tree)) {
+                    setTrees(oldTrees);
+                    returnBool = false;
+                }
+                this.originalRoot = this.trees.get(tools.getTree(this.trees, tree.getTag())).getTag();
             }
         }
         for (Node tree: subnet.getTrees()) {
@@ -122,6 +130,10 @@ public class Network {
             }
         }
         return returnBool;
+    }
+
+    public void setTrees(List<Node> trees) {
+        this.trees = trees;
     }
 
     public List<Node> getTrees() {
@@ -171,8 +183,14 @@ public class Network {
         this.trees.set(tools.getTree(this.trees, root.getTag()), root);
     }
 
-    private boolean hasCircle(Node tree, Node toAdd) {
-
+    private boolean hasCircle(Node tree) {
+        List<Node> dfsTree = tools.dfs(tree, new ArrayList<>());
+        for (Node node: dfsTree) {
+            List<Node> currDfs = tools.dfs(node, new ArrayList<>());
+            if (currDfs.containsAll(dfsTree)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -231,7 +249,8 @@ public class Network {
      */
     public int getHeight(final IP root) {
         moveRoot(this.trees.get(tools.getTree(this.trees, root)), root);
-        return getLevels(root).size() - ONE;
+        int out = getLevels(root).size() - ONE;
+        return out;
     }
 
     /**
@@ -334,6 +353,7 @@ public class Network {
     public String toString(IP root) {
         moveRoot(this.trees.get(tools.getTree(this.trees, root)), root);
         Node rootNode = this.trees.get(tools.getTree(this.trees, root));
-        return tools.recPrint("", rootNode);
+        String out = tools.recPrint("", rootNode);
+        return out;
     }
 }
