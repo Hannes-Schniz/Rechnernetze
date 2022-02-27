@@ -35,7 +35,7 @@ public class tools {
         for (Node node: input) {
             sortedIPs.add(node.getTag());
         }
-        sortedIPs = sortList(sortedIPs, -1);
+        sortedIPs = sortList(sortedIPs, 0);
         for (IP ip: sortedIPs) {
             for (Node node: input) {
                 if (node.getTag().equals(ip)) {
