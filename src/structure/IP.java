@@ -56,7 +56,7 @@ public class IP implements Comparable<IP> {
                 return 1;
             }
         }
-        return 999;
+        return 0;
     }
 
     /**

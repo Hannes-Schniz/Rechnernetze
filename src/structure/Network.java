@@ -66,40 +66,7 @@ public class Network {
      */
     public boolean add(final Network subnet) {
         boolean returnBool = false;
-        //List<Node> newTrees = tools.copyTrees(this.getTrees());
-        //for (Node treeHere: newTrees) { //goes through all local trees
-        //    for (Node nodeHere: tools.sortByLayer(tools.dfs(treeHere, new ArrayList<>()))) { //goes through all nodes of the urr tree
-        //        for (Node subnetTree: subnet.getTrees()) { //goes through all subnet trees
-        //            for (Node subnetNode: tools.sortByLayer(tools.dfs(subnetTree, new ArrayList<>()))) { //goes through all nodes of the curr subnet tree
-        //                if (subnetNode.isRoot() && !contains(subnetNode.getTag())) {
-        //                    newTrees.add(new Node(subnetNode, null));
-        //                }
-        //                if (nodeHere.getTag().equals(subnetNode.getTag())) { //checks if the tags are equal
-        //                    if (!subnetNode.isRoot() && !nodeHere.isRoot()) { //if the nodes have different top nodes it returns false
-        //                        if (!subnetNode.getTag().equals(nodeHere.getTag())) {
-        //                            return false;
-        //                        }
-        //                    }
-        //                    if (!nodeHere.hasAllConnection(subnetNode.getConnections())) { //checks if it has all connections
-        //                        nodeHere.addAllConnections(subnetNode.getConnections()); //adds missing connections
-        //                        nodeHere.setAllUpperNodes(nodeHere); //sets the upper nodes to this node
-        //                    }
-        //                    if (!subnetNode.isRoot() && nodeHere.isRoot()) { //set the upper node if subnetnode is not a root
-        //                        nodeHere.setRoot(false);
-        //                        nodeHere.setUpperNode(tools.findNode(this.trees.get(tools.getTree(this.trees, subnetNode.getTag())), subnetNode.getTag()));
-        //                    }
-        //                    returnBool = true;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    if (hasCircle(treeHere)) {
-        //        return false;
-        //    }
-        //}
-        //this.setTrees(newTrees);
         List<Node> newTrees = new ArrayList<>(tools.copyTrees(getTrees()));
-        boolean hasCirclecurr = false;
         for (Node tree: getTrees()) {
             boolean edited = false;
             List<Node> dfsTree = tools.dfs(tree, new ArrayList<>());
@@ -109,10 +76,10 @@ public class Network {
             if (pos >= ZERO) {
                 newTrees.add(subnet.getTrees().get(pos));
                 dfsTree = tools.dfs(subnet.getTrees().get(pos), new ArrayList<>());
-                while (!dfsTree.containsAll(dfs)) {
+                while (!tools.containsAll(dfsTree, dfs)) {
                     if (!tools.containsIP(dfsTree, dfs.get(i).getTag())) {
                         if (tools.containsIP(dfsTree, dfs.get(i).getUpperNode().getTag())) {
-                            editNode(newTrees, tools.findNode(subnet.getTrees().get(pos),
+                            newTrees = editNode(newTrees, tools.findNode(subnet.getTrees().get(pos),
                                     dfs.get(i).getUpperNode().getTag()), dfs.get(i));
                         }
                     }
@@ -126,7 +93,7 @@ public class Network {
                 }
             }
             if (edited) {
-                newTrees.remove(tree);
+                newTrees.remove(newTrees.get(tools.getTree(newTrees, tree.getTag())));
             }
         }
         for (Node tree: subnet.getTrees()) {
@@ -135,16 +102,16 @@ public class Network {
             int pos = tools.getTree(newTrees, inputDFS.get(i).getTag());
             if (pos >= ZERO) {
                 List<Node> dfsTree = tools.dfs(newTrees.get(pos), new ArrayList<>());
-                while (!dfsTree.containsAll(inputDFS)) {
+                while (!tools.containsAll(dfsTree, inputDFS)) {
                     if (!tools.containsIP(dfsTree, inputDFS.get(i).getTag())) {
                         if (tools.containsIP(dfsTree, inputDFS.get(i).getUpperNode().getTag())) {
-                            editNode(newTrees, tools.findNode(newTrees.get(pos),
+                            newTrees = editNode(newTrees, tools.findNode(newTrees.get(pos),
                                     inputDFS.get(i).getUpperNode().getTag()), inputDFS.get(i));
+                            returnBool = true;
                         }
                     }
                     i++;
                     dfsTree = tools.dfs(newTrees.get(pos), new ArrayList<>());
-                    returnBool = true;
                     if (i == inputDFS.size()) {
                         break;
                     }
@@ -152,11 +119,6 @@ public class Network {
             }
             else {
                 newTrees.add(tree);
-            }
-        }
-        for (Node node: newTrees) {
-            if (hasCircle(node)) {
-                return false;
             }
         }
         setTrees(newTrees);
@@ -185,7 +147,7 @@ public class Network {
         for (Node found: foundList) {
             returnValues.add(found.getTag());
         }
-        return tools.sortList(returnValues);
+        return tools.sortList(returnValues, ONE);
     }
 
     /**
@@ -206,23 +168,14 @@ public class Network {
         return false;
     }
 
-    private void editNode(List<Node> tree, Node target, Node toAdd) {
+    private List<Node> editNode(List<Node> tree, Node target, Node toAdd) {
         toAdd.setUpperNode(target);
         toAdd.setLayer(target.getLayer() + ONE);
         target.addConnection(toAdd);
+        target.setAllUpperNodes(target);
         Node root = tools.shiftTop(target);
         tree.set(tools.getTree(tree, root.getTag()), root);
-    }
-
-    private boolean hasCircle(Node tree) {
-        List<Node> dfsTree = tools.dfs(tree, new ArrayList<>());
-        for (Node node: dfsTree) {
-            List<Node> currDfs = tools.dfs(node, new ArrayList<>());
-            if (currDfs.containsAll(dfsTree)) {
-                return true;
-            }
-        }
-        return false;
+        return tree;
     }
 
     /**
@@ -301,12 +254,12 @@ public class Network {
             for (Node node: tools.sortByLayer(dfs)) {
                 if (curr != node.getLayer()) {
                     curr++;
-                    output.add(tools.sortList(insert));
+                    output.add(tools.sortList(insert, ONE));
                     insert = new ArrayList<>();
                 }
                 insert.add(node.getTag());
             }
-            output.add(tools.sortList(insert));
+            output.add(tools.sortList(insert, ONE));
 
         }
         return output;

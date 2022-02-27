@@ -38,7 +38,6 @@ public class Test {
         // 8 true
         System.out.println("8 true: " + (network.add(new Network("(231.189.0.127 252.29.23.0"
                                 + " 116.132.83.77 39.20.222.120 77.135.84.171)"))));
-        System.out.println(network.toString(root));
         // "Change" root and call toString, getHeight and getLevels again
         root = new IP("85.193.148.81");
         levels = List.of(List.of(root),
@@ -48,6 +47,7 @@ public class Test {
                         new IP("77.135.84.171"), new IP("116.132.83.77"),
                         new IP("122.117.67.158"), new IP("252.29.23.0")));
         // 9 true
+        System.out.println(network.toString(root));
         String compare = "(85.193.148.81 34.49.145.239 (141.255.1.133 0.146.197.108"
                 + " 122.117.67.158) (231.189.0.127 39.20.222.120"
                 + " 77.135.84.171 116.132.83.77 252.29.23.0))";

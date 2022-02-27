@@ -35,20 +35,22 @@ public class tools {
         for (Node node: input) {
             sortedIPs.add(node.getTag());
         }
-        for (IP ip: sortList(sortedIPs)) {
-            for (Node node:input) {
-                if (node.getTag().compareTo(ip) == ZERO) {
+        sortedIPs = sortList(sortedIPs, -1);
+        for (IP ip: sortedIPs) {
+            for (Node node: input) {
+                if (node.getTag().equals(ip)) {
                     output.add(node);
+                    break;
                 }
             }
         }
         return output;
     }
 
-    public static List<IP> sortList(List<IP> input) {
-        int i = ONE;
+    public static List<IP> sortList(List<IP> input, int exclude) {
+        int i = ZERO;
         while (i < input.size()) {
-            if (i > ZERO) {
+            if (i > exclude) {
                 if (input.get(i).compareTo(input.get(i - ONE)) < ZERO) {
                     IP curr = input.get(i);
                     input.set(i, input.get(i - ONE));
@@ -97,6 +99,23 @@ public class tools {
             }
         }
         return false;
+    }
+
+    public static boolean containsAll(List<Node> source, List<Node> contains) {
+        if (source.size() > contains.size()) {
+            return false;
+        }
+        for (Node node: source) {
+            for (int i = 0; i < contains.size(); i++) {
+                if (node.getTag().equals(contains.get(i).getTag())) {
+                    break;
+                }
+                if (i == contains.size()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
