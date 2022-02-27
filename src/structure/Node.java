@@ -42,6 +42,21 @@ public class Node {
         }
     }
 
+    public Node(Node input, Node upper) {
+        this.connections = new ArrayList<>();
+        if (input.getConnections().size() > 0) {
+            for (Node connection: input.getConnections()) {
+                this.addConnection(new Node(connection, this));
+            }
+        }
+        this.setGradiant(input.getGradiant());
+        this.setRoot(input.isRoot());
+        this.setUpperNode(upper);
+        this.setLayer(input.getLayer());
+        this.tag = input.getTag();
+
+    }
+
     /**
      * Instantiates a new Node.
      *
@@ -234,13 +249,18 @@ public class Node {
         this.layer = layer;
     }
 
-    public int hasConnection(IP tag) {
-        for (int i = 0; i < this.connections.size(); i++) {
-            if (this.connections.get(i).getTag().compareTo(tag) == 0) {
-                return i;
+    public boolean hasAllConnection(List<Node> node) {
+        boolean returnBool = false;
+        for (Node connection: this.connections) {
+            boolean hascon = false;
+            for (Node connectionNode: node) {
+                if (connection.getTag().equals(connectionNode.getTag())) {
+                    hascon = true;
+                }
             }
+            returnBool = hascon;
         }
-        return -1;
+        return returnBool;
     }
 
     public void correctLayers() {

@@ -136,4 +136,26 @@ public class tools {
         return root;
     }
 
+    public static List<Node> copyTrees(List<Node> source) {
+        List<Node> copyNetwork = new ArrayList<>();
+        for (Node tree: source) {
+            copyNetwork.add(new Node(tree, null));
+        }
+        return copyNetwork;
+    }
+
+    public static boolean treeEquals(Node tree1, Node tree2) {
+        List<Node> dfsList1 = sortByLayer(dfs(tree1, new ArrayList<>()));
+        List<Node> dfsList2 = sortByLayer(dfs(tree2, new ArrayList<>()));
+        if (dfsList1.size() != dfsList2.size()) {
+            return false;
+        }
+        for (int i = ZERO; i < dfsList1.size(); i++) {
+            if (!dfsList1.get(i).getTag().equals(dfsList2.get(i).getTag())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
