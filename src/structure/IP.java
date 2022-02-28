@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 /**
  * The type Ip.
+ *
  * @author Hannes Schniz
  * @version 1.0
  */

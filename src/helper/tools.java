@@ -7,11 +7,21 @@ import src.structure.Node;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Tools.
+ */
 public class tools {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;
 
+    /**
+     * Contains ip boolean.
+     *
+     * @param tree the tree
+     * @param ip   the ip
+     * @return the boolean
+     */
     public static boolean containsIP(List<Node> tree, IP ip) {
         for (Node node: tree) {
             if (node.getTag().compareTo(ip) == ZERO) {
@@ -21,6 +31,13 @@ public class tools {
         return false;
     }
 
+    /**
+     * Dfs list.
+     *
+     * @param tree  the tree
+     * @param input the input
+     * @return the list
+     */
     public static List<Node> dfs(Node tree, List<Node> input) {
         input.add(tree);
         for (Node node: tree.getConnections()) {
@@ -29,6 +46,12 @@ public class tools {
         return input;
     }
 
+    /**
+     * Sort nodes list.
+     *
+     * @param input the input
+     * @return the list
+     */
     public static List<Node> sortNodes(List<Node> input) {
         List<IP> sortedIPs = new ArrayList<>();
         List<Node> output = new ArrayList<>();
@@ -47,6 +70,13 @@ public class tools {
         return output;
     }
 
+    /**
+     * Sort list list.
+     *
+     * @param input   the input
+     * @param exclude the exclude
+     * @return the list
+     */
     public static List<IP> sortList(List<IP> input, int exclude) {
         boolean sorted = false;
         IP temp;
@@ -64,6 +94,13 @@ public class tools {
         return input;
     }
 
+    /**
+     * Gets tree.
+     *
+     * @param trees the trees
+     * @param tag   the tag
+     * @return the tree
+     */
     public static int getTree(List<Node> trees, IP tag) {
         for (int i = 0; i < trees.size(); i++) {
             List<Node> dfsTree = dfs(trees.get(i), new ArrayList<>());
@@ -76,6 +113,13 @@ public class tools {
         return -ONE;
     }
 
+    /**
+     * Rec print string.
+     *
+     * @param output the output
+     * @param node   the node
+     * @return the string
+     */
     public static String recPrint(String output, Node node) {
         List<String> toParse = new ArrayList<>();
         toParse.add(Parser.parseToString(node.getTag().getAddress()));
@@ -91,6 +135,13 @@ public class tools {
         }
     }
 
+    /**
+     * Contains any boolean.
+     *
+     * @param source   the source
+     * @param contains the contains
+     * @return the boolean
+     */
     public static boolean containsAny(List<IP> source, List<IP> contains) {
         for (IP ip: source) {
             for (IP ip2: contains) {
@@ -102,6 +153,13 @@ public class tools {
         return false;
     }
 
+    /**
+     * Contains all boolean.
+     *
+     * @param source   the source
+     * @param contains the contains
+     * @return the boolean
+     */
     public static boolean containsAll(List<Node> source, List<Node> contains) {
         if (source.size() > contains.size()) {
             return false;
@@ -120,6 +178,12 @@ public class tools {
     }
 
 
+    /**
+     * Sort by layer list.
+     *
+     * @param input the input
+     * @return the list
+     */
     public static List<Node> sortByLayer(List<Node> input) {
         List<Node> output = new ArrayList<>();
         int i = ZERO;
@@ -137,6 +201,13 @@ public class tools {
         return output;
     }
 
+    /**
+     * Find node node.
+     *
+     * @param tree the tree
+     * @param tag  the tag
+     * @return the node
+     */
     public static Node findNode(Node tree, IP tag) {
         List<Node> dfsTree = dfs(tree, new ArrayList<>());
         for (Node node: dfsTree) {
@@ -147,6 +218,12 @@ public class tools {
         return null;
     }
 
+    /**
+     * Shift top node.
+     *
+     * @param input the input
+     * @return the node
+     */
     public static Node shiftTop(Node input) {
         Node root = input;
         while (!root.isRoot()) {
@@ -156,6 +233,12 @@ public class tools {
         return root;
     }
 
+    /**
+     * Copy trees list.
+     *
+     * @param source the source
+     * @return the list
+     */
     public static List<Node> copyTrees(List<Node> source) {
         List<Node> copyNetwork = new ArrayList<>();
         for (Node tree: source) {
@@ -164,6 +247,13 @@ public class tools {
         return copyNetwork;
     }
 
+    /**
+     * Tree equals boolean.
+     *
+     * @param tree1 the tree 1
+     * @param tree2 the tree 2
+     * @return the boolean
+     */
     public static boolean treeEquals(Node tree1, Node tree2) {
         List<Node> dfsList1 = sortByLayer(dfs(tree1, new ArrayList<>()));
         List<Node> dfsList2 = sortByLayer(dfs(tree2, new ArrayList<>()));
@@ -178,6 +268,12 @@ public class tools {
         return true;
     }
 
+    /**
+     * Correct all layers list.
+     *
+     * @param input the input
+     * @return the list
+     */
     public static List<Node> correctAllLayers(List<Node> input) {
         for (Node node: input) {
             List<Node> dfs = dfs(node, new ArrayList<>());

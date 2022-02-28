@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * The type Node.
+ *
  * @author Hannes Schniz
  * @version 1.0
  */
@@ -42,6 +43,12 @@ public class Node {
         }
     }
 
+    /**
+     * Instantiates a new Node.
+     *
+     * @param input the input
+     * @param upper the upper
+     */
     public Node(Node input, Node upper) {
         this.connections = new ArrayList<>();
         if (input.getConnections().size() > 0) {
@@ -148,6 +155,11 @@ public class Node {
         this.setGradiant(connections.size());
     }
 
+    /**
+     * Add connection.
+     *
+     * @param connection the connection
+     */
     public void addConnection(Node connection) {
         if (this.connections == null) {
             this.connections = new ArrayList<>();
@@ -156,6 +168,11 @@ public class Node {
         this.connections.add(connection);
     }
 
+    /**
+     * Add all connections.
+     *
+     * @param connections the connections
+     */
     public void addAllConnections( List<Node> connections) {
         if (connections == null) {
             return;
@@ -211,6 +228,11 @@ public class Node {
         return layer;
     }
 
+    /**
+     * Gets layer nodes.
+     *
+     * @return the layer nodes
+     */
     public List<String> getLayerNodes() {
         List<String> output = new ArrayList<>();
         for (IP ip: getLayerIps()) {
@@ -219,6 +241,11 @@ public class Node {
         return output;
     }
 
+    /**
+     * Remove connection.
+     *
+     * @param toRemove the to remove
+     */
     public void removeConnection(IP toRemove) {
         for (Node connection: this.getConnections()) {
             if (connection.getTag().equals(toRemove)) {
@@ -228,6 +255,11 @@ public class Node {
         }
     }
 
+    /**
+     * Gets layer ips.
+     *
+     * @return the layer ips
+     */
     public List<IP> getLayerIps() {
         List<IP> layer = new ArrayList<>();
         if (this.connections != null) {
@@ -249,6 +281,12 @@ public class Node {
         this.layer = layer;
     }
 
+    /**
+     * Has all connection boolean.
+     *
+     * @param node the node
+     * @return the boolean
+     */
     public boolean hasAllConnection(List<Node> node) {
         boolean returnBool = false;
         for (Node connection: this.connections) {
@@ -263,6 +301,9 @@ public class Node {
         return returnBool;
     }
 
+    /**
+     * Correct layers.
+     */
     public void correctLayers() {
         if (this.upperNode != null) {
             this.layer = upperNode.getLayer() + 1;
@@ -275,6 +316,9 @@ public class Node {
         }
     }
 
+    /**
+     * Correct gradiant.
+     */
     public void correctGradiant() {
         int grad = this.connections.size();
         if (this.upperNode != null) {

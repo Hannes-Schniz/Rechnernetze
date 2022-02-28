@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * The type Parser.
+ *
  * @author Hannes Schniz
  * @version 1.0
  */
@@ -44,6 +45,12 @@ public class Parser {
         return returnValue;
     }
 
+    /**
+     * Parse to tree string [ ].
+     *
+     * @param bracketNotation the bracket notation
+     * @return the string [ ]
+     */
     public static String[] parseToTree(String bracketNotation) {
         String[] working = bracketNotation.split("\s");
         String[] parsedInput = new String[1];
@@ -66,6 +73,12 @@ public class Parser {
         return parsedInput;
     }
 
+    /**
+     * Parse to bracket string.
+     *
+     * @param input the input
+     * @return the string
+     */
     public static String parseToBracket(List<String> input) {
         StringBuilder output = new StringBuilder();
         for (String string: input) {
@@ -79,6 +92,13 @@ public class Parser {
         return String.valueOf(output.append(")"));
     }
 
+    /**
+     * Point notation string [ ].
+     *
+     * @param bracketIPs the bracket i ps
+     * @return the string [ ]
+     * @throws ParseException the parse exception
+     */
     public static String[] pointNotation(String bracketIPs) throws ParseException {
         String[] returnString = bracketIPs.split("\s");
         return returnString;

@@ -7,6 +7,7 @@ import src.helper.*;
 
 /**
  * The type Network.
+ *
  * @author Hannes Schniz
  * @version 1.0
  */
@@ -125,10 +126,20 @@ public class Network {
         return returnBool;
     }
 
+    /**
+     * Sets trees.
+     *
+     * @param trees the trees
+     */
     public void setTrees(List<Node> trees) {
         this.trees = trees;
     }
 
+    /**
+     * Gets trees.
+     *
+     * @return the trees
+     */
     public List<Node> getTrees() {
         return trees;
     }
@@ -154,7 +165,7 @@ public class Network {
      * Connect boolean.
      *
      * @param ipONE the ip ONE
-     * @param ip2 the ip 2
+     * @param ip2   the ip 2
      * @return the boolean
      */
     public boolean connect(final IP ipONE, final IP ip2) {
@@ -182,7 +193,7 @@ public class Network {
      * Disconnect boolean.
      *
      * @param ipONE the ip ONE
-     * @param ip2 the ip 2
+     * @param ip2   the ip 2
      * @return the boolean
      */
     public boolean disconnect(final IP ipONE, final IP ip2) {
@@ -232,12 +243,6 @@ public class Network {
      * @return the height
      */
     public int getHeight(final IP root) {
-        //int returnvalue = ZERO;
-        //if (tools.getTree(this.trees, root) >= ZERO) {
-        //    List<Node> dfs = tools.dfs(tools.findNode(this.trees.get(tools.getTree(this.trees, root)), root), new ArrayList<>());
-        //    dfs = tools.sortByLayer(dfs);
-        //    returnvalue = dfs.get(dfs.size() - 1).getLayer() - 1;
-        //}
         return getLevels(root).size() - ONE;
     }
 
