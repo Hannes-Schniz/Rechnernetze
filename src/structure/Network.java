@@ -232,8 +232,13 @@ public class Network {
      * @return the height
      */
     public int getHeight(final IP root) {
-        int out = getLevels(root).size() - ONE;
-        return out;
+        //int returnvalue = ZERO;
+        //if (tools.getTree(this.trees, root) >= ZERO) {
+        //    List<Node> dfs = tools.dfs(tools.findNode(this.trees.get(tools.getTree(this.trees, root)), root), new ArrayList<>());
+        //    dfs = tools.sortByLayer(dfs);
+        //    returnvalue = dfs.get(dfs.size() - 1).getLayer() - 1;
+        //}
+        return getLevels(root).size() - ONE;
     }
 
     /**
@@ -292,7 +297,7 @@ public class Network {
             }
             newRootTree.set(tools.getTree(newRootTree, tree.getTag()), tools.shiftTop(prev));
         }
-        return newRootTree;
+        return tools.correctAllLayers(newRootTree);
     }
 
     /**

@@ -48,17 +48,18 @@ public class tools {
     }
 
     public static List<IP> sortList(List<IP> input, int exclude) {
-        int i = ZERO;
-        while (i < input.size()) {
-            if (i > exclude) {
-                if (input.get(i).compareTo(input.get(i - ONE)) < ZERO) {
-                    IP curr = input.get(i);
-                    input.set(i, input.get(i - ONE));
-                    input.set(i - ONE, curr);
-                    i--;
+        boolean sorted = false;
+        IP temp;
+        while(!sorted) {
+            sorted = true;
+            for (int i = 0; i < input.size() - 1; i++) {
+                if (input.get(i).compareTo(input.get(i + 1)) > 0) {
+                    temp = input.get(i);
+                    input.set(i, input.get(i + 1));
+                    input.set(i + 1, temp);
+                    sorted = false;
                 }
             }
-            i++;
         }
         return input;
     }
@@ -175,6 +176,21 @@ public class tools {
             }
         }
         return true;
+    }
+
+    public static List<Node> correctAllLayers(List<Node> input) {
+        for (Node node: input) {
+            List<Node> dfs = dfs(node, new ArrayList<>());
+            for (Node dfsNode: dfs) {
+                if (dfsNode.isRoot()) {
+                    dfsNode.setLayer(ZERO);
+                }
+                else {
+                    dfsNode.correctLayers();
+                }
+            }
+        }
+        return input;
     }
 
 }
