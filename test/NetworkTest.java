@@ -1,5 +1,6 @@
 package test;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.engine.support.descriptor.FileSystemSource;
@@ -45,7 +46,8 @@ class NetworkTest {
     }
 
     @Test
-    void add() {
+    void add() throws ParseException {
+        testNetwork.add(new Network("(sd,mnbavmdhn)"));
         testNetwork.add(addNetwork);
         testNetwork.add(stress);
         try {
@@ -88,6 +90,7 @@ class NetworkTest {
 
     @Test
     void testToString() {
+        System.out.println(testNetwork.toString());
     }
 
 }

@@ -169,7 +169,7 @@ public class tools {
                 if (node.getTag().equals(contains.get(i).getTag())) {
                     break;
                 }
-                if (i == contains.size()) {
+                if (i == contains.size() - 1) {
                     return false;
                 }
             }
@@ -287,6 +287,24 @@ public class tools {
             }
         }
         return input;
+    }
+
+    public static boolean hasCircle(List<Node> trees) {
+        for (Node root: trees) {
+            List<Node> fullDfs = dfs(root, new ArrayList<>());
+            for (int i = 0; i < fullDfs.size(); i++) {
+                Node curr = fullDfs.get(i);
+                for (int j = 0; j < fullDfs.size(); j++) {
+                    for (Node connection: curr.getConnections()) {
+                        if (connection.getTag().equals(fullDfs.get(j).getTag())
+                                && !fullDfs.get(j).getUpperNode().getTag().equals(curr.getTag())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }

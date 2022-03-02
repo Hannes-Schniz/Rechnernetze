@@ -95,6 +95,9 @@ public class Network {
             }
             if (edited) {
                 newTrees.remove(newTrees.get(tools.getTree(newTrees, tree.getTag())));
+                if (tools.hasCircle(newTrees)) {
+                    return false;
+                }
             }
         }
         for (Node tree: subnet.getTrees()) {
