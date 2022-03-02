@@ -47,7 +47,7 @@ class NetworkTest {
 
     @Test
     void add() throws ParseException {
-        testNetwork.add(new Network("(sd,mnbavmdhn)"));
+        assertThrows(new ParseException("IP does not match IPV4 pattern"), testNetwork.add(new Network("(sd,mnbavmdhn)")));
         testNetwork.add(addNetwork);
         testNetwork.add(stress);
         try {
